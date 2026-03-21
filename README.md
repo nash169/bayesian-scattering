@@ -1,61 +1,63 @@
 # Bayesian Scattering
 A Bayesian scattering baseline for uncertainty quantification.
 
-<style>
-.wrapper {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.column {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.column img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-</style>
-
-<div class="wrapper">
-
-  <div class="column">
-    <img src="media/histology_train_1.png">
-    <img src="media/histology_train_2.png">
-    <img src="media/histology_test_1.png">
-    <img src="media/histology_test_2.png">
-  </div>
-
-  <div class="column">
-    <img src="media/skin_train_1.png">
-    <img src="media/skin_train_2.png">
-    <img src="media/skin_test_1.png">
-    <img src="media/skin_test_2.png">
-  </div>
-
-  <div class="column">
-    <img src="media/asset_train_1.png">
-    <img src="media/asset_train_2.png">
-    <img src="media/asset_test_1.png">
-    <img src="media/asset_test_2.png">
-  </div>
-
-</div>
+<table>
+  <tr>
+    <td valign="top" align="center">
+      <strong>Histology</strong>
+      <table>
+        <tr>
+          <td><img src="media/histology_train_1.png" alt="Histology training sample 1" width="110"></td>
+          <td><img src="media/histology_train_2.png" alt="Histology training sample 2" width="110"></td>
+        </tr>
+        <tr>
+          <td><img src="media/histology_test_1.png" alt="Histology test sample 1" width="110"></td>
+          <td><img src="media/histology_test_2.png" alt="Histology test sample 2" width="110"></td>
+        </tr>
+      </table>
+    </td>
+    <td valign="top" align="center">
+      <strong>Skin Lesion</strong>
+      <table>
+        <tr>
+          <td><img src="media/skin_train_1.png" alt="Skin lesion training sample 1" width="110"></td>
+          <td><img src="media/skin_train_2.png" alt="Skin lesion training sample 2" width="110"></td>
+        </tr>
+        <tr>
+          <td><img src="media/skin_test_1.png" alt="Skin lesion test sample 1" width="110"></td>
+          <td><img src="media/skin_test_2.png" alt="Skin lesion test sample 2" width="110"></td>
+        </tr>
+      </table>
+    </td>
+    <td valign="top" align="center">
+      <strong>Asset</strong>
+      <table>
+        <tr>
+          <td><img src="media/asset_train_1.png" alt="Asset training sample 1" width="110"></td>
+          <td><img src="media/asset_train_2.png" alt="Asset training sample 2" width="110"></td>
+        </tr>
+        <tr>
+          <td><img src="media/asset_test_1.png" alt="Asset test sample 1" width="110"></td>
+          <td><img src="media/asset_test_2.png" alt="Asset test sample 2" width="110"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
 
 ## Getting Started
-Install `uv`:
+Install the package with `pip`:
+```sh
+pip install -e .
+```
+
+There is also a `uv` option if you prefer to manage the environment that way:
 ```sh
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-Sync the environment and activate it:
-```sh
 uv sync
 source .venv/bin/activate
 ```
+
 Without installing the package, you can run the examples and benchmarks as Python modules:
 ```sh
 python -m <path/to>.<script>
