@@ -4,7 +4,7 @@ A Bayesian scattering baseline for uncertainty quantification.
 <table>
   <tr>
     <td valign="top" align="center">
-      <strong>Histology</strong>
+      <strong>Histology Nuclei Pixels</strong>
       <table>
         <tr>
           <td><img src="media/histology_train_1.png" alt="Histology training sample 1" width="110"></td>
@@ -17,7 +17,7 @@ A Bayesian scattering baseline for uncertainty quantification.
       </table>
     </td>
     <td valign="top" align="center">
-      <strong>Skin Lesion</strong>
+      <strong>Skin Lesion Pixels</strong>
       <table>
         <tr>
           <td><img src="media/skin_train_1.png" alt="Skin lesion training sample 1" width="110"></td>
@@ -30,7 +30,7 @@ A Bayesian scattering baseline for uncertainty quantification.
       </table>
     </td>
     <td valign="top" align="center">
-      <strong>Asset</strong>
+      <strong>Asset Wealth</strong>
       <table>
         <tr>
           <td><img src="media/asset_train_1.png" alt="Asset training sample 1" width="110"></td>
