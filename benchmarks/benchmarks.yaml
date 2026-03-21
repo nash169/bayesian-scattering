@@ -1,0 +1,99 @@
+dist_shift_cut_poverty:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: 1000
+  max_test: 250
+  dataset: "poverty"
+  features: ["scattering_cov_J5_L8", "scattering_cov_J6_L8", "scattering_cov_J7_L8", "scattering_inv_J5_L8", "scattering_inv_J6_L8", "scattering_inv_J7_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
+  models: ["baseline", "gp_exact_reg_rbf", "gp_exact_reg_rbf_ard", "gp_exact_reg_matern52", "gp_exact_reg_matern52_ard",  "ensemble_reg_nonlinear"]
+
+dist_shift_full_poverty:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: null
+  max_test: 250
+  dataset: "poverty"
+  features: ["scattering_cov_J6_L8", "scattering_cov_J7_L8", "scattering_inv_J6_L8", "scattering_inv_J7_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
+  models: ["baseline", "gp_approx_reg_rbf", "gp_approx_reg_rbf_ard", "gp_approx_reg_matern52", "gp_approx_reg_matern52_ard", "ensemble_reg_nonlinear"]
+
+dist_shift_cut_ens_poverty:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: 1000
+  max_test: 250
+  dataset: "poverty"
+  features: ["identity"]
+  models: ["ensemble_timm_reg_convnext_atto"]
+
+dist_shift_full_ens_poverty:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: null
+  max_test: 250
+  dataset: "poverty"
+  features: ["identity"]
+  models: ["ensemble_timm_reg_convnext_atto"]
+
+# -----------------------------------------------------
+
+dist_shift_cut_skin_lesion:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: 1000
+  max_test: 250
+  dataset: "skin_lesion"
+  features: ["scattering_cov_J3_L8", "scattering_cov_J4_L8", "scattering_cov_J5_L8", "scattering_inv_J3_L8", "scattering_inv_J4_L8", "scattering_inv_J5_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
+  models: ["baseline", "gp_exact_reg_rbf", "gp_exact_reg_rbf_ard", "gp_exact_reg_matern52", "gp_exact_reg_matern52_ard",  "ensemble_reg_nonlinear"]
+
+dist_shift_full_skin_lesion:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: null
+  max_test: 250
+  dataset: "skin_lesion"
+  features: ["scattering_cov_J3_L8", "scattering_cov_J4_L8", "scattering_cov_J5_L8", "scattering_inv_J3_L8", "scattering_inv_J4_L8", "scattering_inv_J5_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
+  models: ["baseline", "gp_approx_reg_rbf", "gp_approx_reg_rbf_ard", "gp_approx_reg_matern52", "gp_approx_reg_matern52_ard", "ensemble_reg_nonlinear"]
+
+dist_shift_cut_ens_skin_lesion:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: 1000
+  max_test: 250
+  dataset: "skin_lesion"
+  features: ["identity"]
+  models: ["ensemble_timm_reg_convnext_atto"]
+
+dist_shift_full_ens_skin_lesion:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: null
+  max_test: 250
+  dataset: "skin_lesion"
+  features: ["identity"]
+  models: ["ensemble_timm_reg_convnext_atto"]
+
+# -----------------------------------------------------
+
+dist_shift_cut_histology_nuclei:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: 1000
+  max_test: 250
+  dataset: "histology_nuclei"
+  features: ["scattering_cov_J3_L8", "scattering_cov_J4_L8", "scattering_cov_J5_L8", "scattering_inv_J3_L8", "scattering_inv_J4_L8", "scattering_inv_J5_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
+  models: ["baseline", "gp_exact_reg_rbf", "gp_exact_reg_rbf_ard", "gp_exact_reg_matern52", "gp_exact_reg_matern52_ard",  "ensemble_reg_nonlinear"]
+
+dist_shift_full_histology_nuclei:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: null
+  max_test: 250
+  dataset: "histology_nuclei"
+  features: ["scattering_cov_J3_L8", "scattering_cov_J4_L8", "scattering_cov_J5_L8", "scattering_inv_J3_L8", "scattering_inv_J4_L8", "scattering_inv_J5_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
+  models: ["baseline", "gp_approx_reg_rbf", "gp_approx_reg_rbf_ard", "gp_approx_reg_matern52", "gp_approx_reg_matern52_ard", "ensemble_reg_nonlinear"]
+
+dist_shift_cut_ens_histology_nuclei:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: 1000
+  max_test: 250
+  dataset: "histology_nuclei"
+  features: ["identity"]
+  models: ["ensemble_timm_reg_convnext_atto"]
+
+dist_shift_full_ens_histology_nuclei:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: null
+  max_test: 250
+  dataset: "histology_nuclei"
+  features: ["identity"]
+  models: ["ensemble_timm_reg_convnext_atto"]

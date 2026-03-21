@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+from setuptools import find_packages, setup
+
+
+setup(packages=find_packages(include=["bayesian_scattering", "bayesian_scattering.*"]))

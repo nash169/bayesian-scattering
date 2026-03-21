@@ -1,0 +1,23 @@
+[project]
+name = "bayesian-scattering"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "botorch>=0.13.0",
+    "gpytorch>=1.14",
+    "ipympl>=0.9.7",
+    "jupyterlab>=4.3.6",
+    "matplotlib>=3.10.1",
+    "pandas>=2.2.3",
+    "torch>=2.6.0",
+    "kymatio @ git+https://github.com/nash169/kymatio.git@49d707f512333683a7beb99e05d337252781b61c",
+    "torchvision>=0.21.0",
+    "jupyterlab-nvdashboard>=0.13.0",
+    "timm>=1.0.15",
+    "wilds>=2.0.0",
+    "tdqm>=0.0.1",
+    "unimol-tools>=0.1.5",
+    "jupytext>=1.19.1",
+]
