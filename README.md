@@ -77,3 +77,26 @@ os.environ["FEATURES_PATH"] =
 os.environ["RESULTS_PATH"] =
 ```
 The first defines where the datasets are stored. The second defines where the generated features are stored, which avoids recomputing them every time you run a script. The third defines where the results are saved.
+
+Expected layout under `os.environ["DATA_PATH"]` for the pre-existing datasets:
+```text
+DATA_PATH/
+├── pixels/
+│   ├── skin_lesion/
+│   │   ├── images_train.pkl
+│   │   ├── labels_train.pkl
+│   │   ├── images_test.pkl
+│   │   └── labels_test.pkl
+│   └── histology_nuclei/
+│       ├── images_train.pkl
+│       ├── labels_train.pkl
+│       ├── images_test.pkl
+│       └── labels_test.pkl
+└── wilds/
+    └── poverty_v1.1/
+```
+
+- `skin_lesion` should be located at `os.environ["DATA_PATH"]/pixels/skin_lesion`.
+- `histology_nuclei` should be located at `os.environ["DATA_PATH"]/pixels/histology_nuclei`.
+- The asset wealth dataset (`poverty`) should be located at `os.environ["DATA_PATH"]/wilds/poverty_v1.1`.
+- `qm2` (QM2D) and `qm9` are generated or downloaded automatically when needed, so you do not need to prepare their folders manually.
