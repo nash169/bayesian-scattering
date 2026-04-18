@@ -1,4 +1,5 @@
 import torch
+import torchvision.transforms.functional as F
 import pickle
 from importlib.resources import files
 from bayesian_scattering.datasets.abstract_dataset import AbstractDataset
@@ -17,12 +18,12 @@ class Pixels(AbstractDataset):
 
         if split == "train":
             with open(dataset_path.joinpath(f'{dataset_name}/images_train.pkl'), 'rb') as f_x:
-                self.samples = torch.from_numpy(pickle.load(f_x)).float().permute(0, 3, 1, 2).contiguous()
+                self.samples = torch.from_numpy(pickle.load(f_x)).float().permute(0, 3, 1, 2).contiguous() / 255.
             with open(dataset_path.joinpath(f'{dataset_name}/labels_train.pkl'), 'rb') as f_y:
                 self.labels = torch.from_numpy(pickle.load(f_y)).float().contiguous()
         elif split == "test":
             with open(dataset_path.joinpath(f'{dataset_name}/images_test.pkl'), 'rb') as f_x:
-                self.samples = torch.from_numpy(pickle.load(f_x)).float().permute(0, 3, 1, 2).contiguous()
+                self.samples = torch.from_numpy(pickle.load(f_x)).float().permute(0, 3, 1, 2).contiguous() / 255.
             with open(dataset_path.joinpath(f'{dataset_name}/labels_test.pkl'), 'rb') as f_y:
                 self.labels = torch.from_numpy(pickle.load(f_y)).float().contiguous()
 
