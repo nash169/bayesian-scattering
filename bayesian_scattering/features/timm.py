@@ -1,5 +1,7 @@
 import torch
 import timm
+import torchvision
+import numpy as np
 
 from typing import Optional, Self
 
@@ -13,35 +15,40 @@ class TorchImageModel(AbstractFeatures):
         pretrained_model='convnext_base.fb_in1k',
         store_path=None,
         dataset: Optional[AbstractDataset] = None,
+        transforms: Optional[torchvision.transforms.Compose] = None,
+        shard_size: int = 5_000,
+        dtype=np.float32,
         **kwargs
     ):
         self.model = timm.create_model(
             pretrained_model,
             pretrained=True,
-            # features_only=True,
             num_classes=0,  # remove classifier nn.Linear
         )
         self.model = self.model.eval()
-        self.transforms = timm.data.create_transform(
-            **timm.data.resolve_model_data_config(self.model),
-            is_training=False
-        )
+        # self.transforms = timm.data.create_transform(
+        #     **timm.data.resolve_model_data_config(self.model),
+        #     is_training=False
+        # )
 
         super().__init__(
             dataset=dataset,
-            cache_root=store_path, 
-            transform_id=pretrained_model.replace(".", "_"), 
+            transforms=transforms,
+            cache_root=store_path,
+            features_id=pretrained_model.replace(".", "_"),
+            shard_size=shard_size,
+            dtype=dtype,
         )
 
     def features_from_sample(self, x: torch.Tensor) -> torch.Tensor:
-        num_ch = x.shape[0] if len(x.shape) == 3 else x.shape[1]
-        if num_ch > 3:
-            x_in = x.to(self.device).reshape(-1, *x.shape[-2:])
-            x_in = x_in.unsqueeze(1).repeat(1, 3, *([1] * len(x.shape[-2:])))
-        else:
-            x_in = x.to(self.device)
+        # num_ch = x.shape[0] if len(x.shape) == 3 else x.shape[1]
+        # if num_ch > 3:
+        #     x_in = x.to(self.device).reshape(-1, *x.shape[-2:])
+        #     x_in = x_in.unsqueeze(1).repeat(1, 3, *([1] * len(x.shape[-2:])))
+        # else:
+        #     x_in = x.to(self.device)
 
-        y = self.transforms(x_in)
+        y = self.transforms(x).to(self.device)
         if len(y.shape) == 3:
             y = y.unsqueeze(0)
 

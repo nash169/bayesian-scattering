@@ -2,6 +2,7 @@ import os
 import json
 import numpy as np
 import torch
+import torchvision
 
 import logging
 logging.getLogger("filelock").setLevel(logging.INFO)
@@ -18,8 +19,9 @@ class AbstractFeatures(Dataset, ABC):
     def __init__(
         self,
         dataset: Optional[AbstractDataset] = None,
+        transforms: Optional[torchvision.transforms.Compose] = None,
         cache_root: Optional[str] = None,
-        transform_id: str = "features_id",
+        features_id: str = "features_id",
         shard_size: int = 5_000,
         dtype=np.float32,
     ):
@@ -30,9 +32,9 @@ class AbstractFeatures(Dataset, ABC):
         if cache_root is not None:
             self.shard_size = int(shard_size)
             self.dtype = np.dtype(dtype)
-            self.transform_id = transform_id
+            self.features_id = features_id
 
-            self.cache_dir = os.path.join(cache_root, transform_id)
+            self.cache_dir = os.path.join(cache_root, features_id)
             os.makedirs(self.cache_dir, exist_ok=True)
             os.makedirs(os.path.join(self.cache_dir, "locks"), exist_ok=True)
 
@@ -46,15 +48,13 @@ class AbstractFeatures(Dataset, ABC):
 
             self._init_lock = FileLock(os.path.join(self.cache_dir, "init.lock"))
 
+        self.transforms = transforms
+
     @abstractmethod
     def features_from_sample(
         self,
         x: torch.Tensor
     ) -> torch.Tensor:
-        ...
-
-    @abstractmethod
-    def to(self, device) -> Self:
         ...
 
     def __len__(self):
@@ -109,7 +109,7 @@ class AbstractFeatures(Dataset, ABC):
 
     def _write_meta(self, x: int):
         meta = {
-            "id": self.transform_id,
+            "id": self.features_id,
             "dtype": "float32",
             "N": self.N,
             "x": int(x),
@@ -199,3 +199,7 @@ class AbstractFeatures(Dataset, ABC):
                 self._present_mms[shard_id][off] = 1
                 self._data_mms[shard_id].flush()
                 self._present_mms[shard_id].flush()
+
+    def to(self, device) -> Self:
+        self.device = device
+        return self

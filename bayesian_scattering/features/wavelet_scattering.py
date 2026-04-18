@@ -4,6 +4,7 @@ import numpy as np
 from typing import Optional, Self
 from kymatio.torch import Scattering2D, HarmonicScattering3D
 from kymatio.scattering3d.backend.torch_backend import TorchBackend3D
+from torchvision.ops.boxes import torchvision
 
 from bayesian_scattering.datasets.abstract_dataset import AbstractDataset
 from bayesian_scattering.features.abstract_features import AbstractFeatures
@@ -14,11 +15,11 @@ class WaveletScattering(AbstractFeatures):
         self,
         dimension=None,
         rot_invariant=False,
-        dataset: Optional[AbstractDataset] = None,
         store_path: Optional[str] = None,
-        shard_size: int = 1_000,
+        dataset: Optional[AbstractDataset] = None,
+        transforms: Optional[torchvision.transforms.Compose] = None,
+        shard_size: int = 5_000,
         dtype=np.float32,
-        transform: Optional[torch.nn.Module] = None,
         **kwargs
     ):
         if dataset is None:
@@ -26,7 +27,11 @@ class WaveletScattering(AbstractFeatures):
             assert "shape" in kwargs, "shape unknown"
         else:
             dimension = len(dataset.shape)
-            kwargs['shape'] = dataset.shape[-dimension:] if transform is None else transform.size
+            kwargs['shape'] = dataset.shape[-dimension:]
+            if transforms is not None:
+                for t in transforms.transforms:
+                    if isinstance(t, torchvision.transforms.Resize):
+                        kwargs['shape'] = t.size
 
         if dimension == 1:
             raise NotImplementedError("1D not implemented")
@@ -43,14 +48,13 @@ class WaveletScattering(AbstractFeatures):
         else:
             raise TypeError(f"Expected dimension equal to 1, 2 or 3, got {dimension}.")
 
-        self.transform = transform
-        if self.transform is not None:
-            prefix += "_t"
-
         super().__init__(
             dataset=dataset,
+            transforms=transforms,
             cache_root=store_path,
-            transform_id=prefix,
+            features_id=prefix,
+            shard_size=shard_size,
+            dtype=dtype,
         )
 
     def features_from_sample(

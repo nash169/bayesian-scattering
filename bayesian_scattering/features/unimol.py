@@ -41,7 +41,7 @@ class Unimol(AbstractFeatures):
         super().__init__(
             dataset=dataset,
             cache_root=store_path,
-            transform_id="unimol"
+            features_id="unimol"
         )
 
     def features_from_sample(self, x: dict) -> torch.Tensor:
