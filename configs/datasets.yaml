@@ -1,0 +1,36 @@
+qm2:
+  max_train: 1000
+  max_test: null
+  density_type: "valence"
+  split: false
+qm9:
+  max_train: 1000
+  max_test: null
+  grid_res: [192, 128, 96]
+  rescale: true
+  sigma: 2.0
+  overlapping_precision: 1.0e-1
+  target: "homo"
+  split: false
+qm9_oxygen_shift:
+  max_train: 1000
+  max_test: null
+  grid_res: [64, 64, 64]
+  rescale: true
+  sigma: 2.0
+  overlapping_precision: 1.0e-1
+  target: "alpha"
+  split: true
+  shift: 'O'
+poverty:
+  max_train: 1000
+  max_test: 250
+skin_lesion:
+  max_train: 1000
+  max_test: 250
+histology_nuclei:
+  max_train: 1000
+  max_test: 250
+iwildcam:
+  max_train: 1000
+  max_test: 250

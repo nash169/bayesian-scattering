@@ -1,0 +1,101 @@
+# skin_lesion - histology_nuclei J-2
+scattering_inv_J3_L8:
+  J: 3
+  L: 8
+  max_order: 2
+  rot_invariant: true
+
+scattering_cov_J3_L8:
+  J: 3
+  L: 8
+  max_order: 2
+  rot_invariant: false
+
+scattering_inv_J4_L8:
+  J: 4
+  L: 8
+  max_order: 2
+  rot_invariant: true
+
+scattering_cov_J4_L8:
+  J: 4
+  L: 8
+  max_order: 2
+  rot_invariant: false
+
+scattering_inv_J5_L8:
+  J: 5
+  L: 8
+  max_order: 2
+  rot_invariant: true
+scattering_cov_J5_L8:
+  J: 5 # skin_lesion - histology_nuclei
+  L: 8
+  max_order: 2
+  rot_invariant: false
+scattering_inv_J6_L8:
+  J: 6
+  L: 8
+  max_order: 2
+  rot_invariant: true
+scattering_cov_J6_L8:
+  J: 6
+  L: 8
+  max_order: 2
+  rot_invariant: false
+scattering_inv_J7_L8:
+  J: 7 # poverty
+  L: 8
+  max_order: 2
+  rot_invariant: true
+scattering_cov_J7_L8:
+  J: 7 # poverty
+  L: 8
+  max_order: 2
+  rot_invariant: false
+scattering_inv_J8_L8:
+  J: 8 # qm2d
+  L: 8
+  max_order: 2
+  rot_invariant: true
+scattering_cov_J8_L8:
+  J: 8 # qm2d
+  L: 8
+  max_order: 2
+  rot_invariant: false
+scattering_cov_3D_J4_L3:
+  J: 4
+  L: 3
+  sigma_0: 2.0
+  max_order: 2
+  rot_invariant: false
+  method: 'integral'
+  points: null
+  integral_powers: [0.5, 1.0, 2.0, 3.0, 4.0]
+scattering_inv_3D_J4_L3:
+  J: 4
+  L: 3
+  sigma_0: 2.0
+  max_order: 2
+  rot_invariant: true
+  method: 'integral'
+  points: null
+  integral_powers: [0.5, 1.0, 2.0, 3.0, 4.0]
+timm_convnext_base:
+  pretrained_model: "convnext_base.fb_in1k"
+timm_convnext_atto:
+  pretrained_model: "convnext_atto.d2_in1k"
+timm_convnextv2_base:
+  pretrained_model: "convnextv2_base.fcmae_ft_in1k"
+timm_convnextv2_atto:
+  pretrained_model: "convnextv2_atto.fcmae_ft_in1k"
+timm_dinov2_small:
+  pretrained_model: "vit_small_patch14_reg4_dinov2.lvd142m"
+timm_dinov2_base:
+  pretrained_model: "vit_base_patch14_reg4_dinov2.lvd142m"
+unimol_qm9:
+  dummy: "something"
+unimol_qm2:
+  dummy: "something"
+identity:
+  dummy: "something"
