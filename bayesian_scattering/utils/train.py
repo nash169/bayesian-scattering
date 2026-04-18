@@ -2,11 +2,9 @@ import torch
 import gpytorch
 import gpytorch.settings as cfg
 import tqdm
-import time
 
 from torch.utils.data import DataLoader
 from torch.nn import Module
-from jaxtyping import Int
 from typing import Callable, Optional
 from torch.utils.data import DataLoader
 from torch.optim import Optimizer
