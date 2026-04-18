@@ -208,8 +208,9 @@ models:
       nu: 2.5
       lengthscale: auto
       ard_num_dims: auto
-  laplace_reg_mlp:
-    layers: [20, 30, 10]
+  la_reg_nonlinear:
+    layers: [128]
+    activation: tanh
     noise_var: 1e-2
     subset_of_weights: last_layer
     hessian_structure: diag

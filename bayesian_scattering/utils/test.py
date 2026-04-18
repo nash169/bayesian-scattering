@@ -1,18 +1,14 @@
-from numpy import isin
-from timm.models.deit import deit3_base_patch16_224
 import torch
 import gpytorch
 
-from bayesian_scattering.models.ensemble import Ensemble
 from bayesian_scattering.utils.metrics import quantile_coverage_error_signed, prediction_interval_length
-from bayesian_scattering.models import Baseline
+from bayesian_scattering.models import Baseline, Ensemble
 
 
 def test_regression(
     model,
     loader,
     labels_norm=None,
-    verbose=False
 ):
     eval_log = {
         'rmse': 0.0,
@@ -42,7 +38,7 @@ def test_regression(
             if labels_norm is not None:
                 mu_y, std_y = labels_norm
                 y_batch.sub_(mu_y).div_(std_y)
-            if isinstance(model, Baseline) or isinstance(model,Ensemble):
+            if isinstance(model, (Baseline, Ensemble, LaplaceApproximation)):
                 posterior = model.posterior(x_batch)
             else:
                 posterior = model.likelihood(model(x_batch))
@@ -76,7 +72,6 @@ def test_regression(
 def test_classification(
     model,
     loader,
-    verbose=False,
     **kwargs
 ):
     eval_log = torch.zeros(2)

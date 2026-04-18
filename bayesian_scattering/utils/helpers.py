@@ -1,17 +1,17 @@
-from numpy import full
 import torch
+import torchvision.transforms as T
 import torch.nn as nn
 import gpytorch
 import pickle
 
 from torch.utils.data import Subset, DataLoader
-from torchvision.transforms import Resize
-from bayesian_scattering import features
+import wilds
 from bayesian_scattering.datasets import *
 from bayesian_scattering.features import *
 from bayesian_scattering.models import *
 from bayesian_scattering.utils.train import train_exact_gp, train_approx_gp, train_mlp
 from bayesian_scattering.utils.math import average_distance
+from bayesian_scattering.utils.transforms import Grayscale
 
 
 def get_dataset(dataset_name, store_path, device=torch.device("cpu"), **kwargs):
@@ -41,10 +41,7 @@ def get_dataset(dataset_name, store_path, device=torch.device("cpu"), **kwargs):
         ).to(device)
         if kwargs['split']:
             atoms = dict(H=1, C=6, O=8, N=7, S=16, F=9)
-            atom_mask = torch.any(
-                fullset.full_charges == atoms[kwargs['shift']],
-                axis=1
-            )
+            atom_mask = torch.any(fullset.full_charges == atoms[kwargs['shift']], axis=1)
             trainset = Subset(fullset, torch.nonzero(~atom_mask))
             testset = Subset(fullset, torch.nonzero(~atom_mask))
         else:
@@ -78,20 +75,36 @@ def get_feature(
     **kwargs,
 ):
     if feature_name.startswith("scattering"):
+        if isinstance(dataset, QM2) or isinstance(dataset, QM9):
+            dataset.unimol = False
+
         feature = WaveletScattering(
             store_path=store_path,
             dataset=dataset,
-            transform=Resize((256, 256)) if isinstance(dataset, WILDS) else None,
             **kwargs
         ).to(device)
-        if isinstance(dataset, QM2) or isinstance(dataset, QM9):
-            dataset.unimol = False
     elif feature_name.startswith("timm"):
-        feature = TorchImageModel(
-            store_path=store_path, dataset=dataset, **kwargs
-        ).to(device)
         if isinstance(dataset, QM2) or isinstance(dataset, QM9):
             dataset.unimol = False
+
+        if isinstance(dataset, Pixels):
+            transforms = T.Compose([
+                T.Resize(size=224, interpolation=T.InterpolationMode.BICUBIC, max_size=None, antialias=True),
+                T.Normalize(mean=torch.tensor([0.4850, 0.4560, 0.4060]), std=torch.tensor([0.2290, 0.2240, 0.2250]))
+            ])
+
+        if isinstance(dataset, WILDS) and dataset.dataset.dataset_name == "poverty":
+            transforms = T.Compose([
+                Grayscale(),
+                T.Normalize(mean=torch.tensor([0.4850, 0.4560, 0.4060]), std=torch.tensor([0.2290, 0.2240, 0.2250])),
+            ])
+
+        feature = TorchImageModel(
+            store_path=store_path,
+            dataset=dataset,
+            transforms=transforms,
+            **kwargs
+        ).to(device)
     elif feature_name.startswith("unimol"):
         assert isinstance(dataset, QM2) or isinstance(dataset, QM9), "Unimol features are only compatible with QM9 dataset"
         dataset.unimol = True
@@ -228,7 +241,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
         mlp_layers = [input_dim, *list(layers), 1]
 
         base_model = MLP(layers=mlp_layers).to(device)
-        model = LaplaceRegressor(
+        model = LaplaceApproximation(
             base_model,
             subset_of_weights=kwargs.get("subset_of_weights", "last_layer"),
             hessian_structure=kwargs.get("hessian_structure", "diag"),
@@ -306,6 +319,36 @@ def train_model(model, data, cfg, device):
                 **cfg["train"],
                 **cfg["gpytorch"]
             )
+        elif isinstance(model, LaplaceApproximation):
+            optimizer = torch.optim.Adam(
+                model.model.parameters(),
+                **cfg["optimizer"]
+            )
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer,
+                **cfg["scheduler"]
+            )
+            loss = train_mlp(
+                model=model.model,
+                loss_fn=nn.MSELoss(),
+                data_loader=train_loader,
+                optimizer=optimizer,
+                scheduler=scheduler,
+                **cfg["train"],
+            )
+            fit_loader_kwargs = dict(cfg["dataloader"])
+            fit_loader_kwargs["shuffle"] = False
+            if fit_loader_kwargs.get("num_workers", 0) == 0:
+                fit_loader_kwargs.pop("prefetch_factor", None)
+                fit_loader_kwargs.pop("persistent_workers", None)
+            fit_loader = DataLoader(
+                data,
+                **fit_loader_kwargs
+            )
+            model.fit(
+                fit_loader,
+                progress_bar=cfg["train"].get("verbose", False),
+            )
         elif isinstance(model, Ensemble):
             loss = torch.zeros(len(model.ensemble))
             for count, mlp in enumerate(model.ensemble):
@@ -332,30 +375,6 @@ def train_model(model, data, cfg, device):
                 mlp.cpu()
             loss = loss.mean().item()
         else:
-            # optimizer = torch.optim.Adam(
-            #     model.model.parameters(),
-            #     lr=cfg["train"].get("laplace_lr", 1e-3),
-            #     weight_decay=0.0,
-            # )
-            # loss_fn = nn.MSELoss()
-            # loss = train_mlp(
-            #     model.model,
-            #     loss_fn,
-            #     train_loader,
-            #     optimizer,
-            #     epochs=cfg["train"]["epochs"],
-            #     tol=cfg["train"]["tol"],
-            #     patience=cfg["train"]["patience"],
-            #     verbose=False,
-            # )
-            # fit_loader = DataLoader(
-            #     f_train,
-            #     batch_size=cfg["train"]["batch_size"],
-            #     shuffle=False,
-            #     num_workers=0,
-            #     pin_memory=True,
-            # )
-            # model.fit(fit_loader)
             raise ValueError("No training available for the current model")
     return loss
 

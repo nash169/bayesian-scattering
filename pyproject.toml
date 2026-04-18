@@ -3,7 +3,7 @@ name = "bayesian-scattering"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.13"
 dependencies = [
     "botorch>=0.13.0",
     "gpytorch>=1.14",
@@ -20,4 +20,7 @@ dependencies = [
     "tdqm>=0.0.1",
     "unimol-tools>=0.1.5",
     "jupytext>=1.19.1",
+    "scikit-image>=0.26.0",
+    "curvlinops-for-pytorch<3",
+    "laplace-torch>=0.2.2.2",
 ]
