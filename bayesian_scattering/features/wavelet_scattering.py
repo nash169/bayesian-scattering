@@ -62,8 +62,8 @@ class WaveletScattering(AbstractFeatures):
         x: torch.Tensor
     ) -> torch.Tensor:
         x = x.to(self.device)
-        if self.transform is not None:
-            x = self.transform(x)
+        if self.transforms is not None:
+            x = self.transforms(x)
 
         if len(self.ws.shape) == 1:
             return x

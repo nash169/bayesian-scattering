@@ -2,7 +2,7 @@ import torch
 import gpytorch
 
 from bayesian_scattering.utils.metrics import quantile_coverage_error_signed, prediction_interval_length
-from bayesian_scattering.models import Baseline, Ensemble
+from bayesian_scattering.models import Baseline, Ensemble, LaplaceApproximation
 
 
 def test_regression(

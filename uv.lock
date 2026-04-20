@@ -226,7 +226,6 @@ requires-dist = [
     { name = "tdqm", specifier = ">=0.0.1" },
     { name = "timm", specifier = ">=1.0.15" },
     { name = "torch", specifier = ">=2.6.0" },
-    { name = "torchvision", specifier = ">=0.15" },
     { name = "torchvision", specifier = ">=0.21.0" },
     { name = "unimol-tools", specifier = ">=0.1.5" },
     { name = "wilds", specifier = ">=2.0.0" },
