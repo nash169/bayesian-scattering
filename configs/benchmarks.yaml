@@ -97,3 +97,9 @@ dist_shift_full_ens_histology_nuclei:
   dataset: "histology_nuclei"
   features: ["identity"]
   models: ["ensemble_timm_reg_convnext_atto"]
+
+# -----------------------------------------------------
+
+bayesian_opt:
+  initial_design_size: 50
+  n_iters: 50

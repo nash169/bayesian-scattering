@@ -3,6 +3,7 @@ qm2:
   max_test: null
   density_type: "valence"
   split: false
+
 qm9:
   max_train: 1000
   max_test: null
@@ -12,6 +13,7 @@ qm9:
   overlapping_precision: 1.0e-1
   target: "homo"
   split: false
+
 qm9_oxygen_shift:
   max_train: 1000
   max_test: null
@@ -22,15 +24,22 @@ qm9_oxygen_shift:
   target: "alpha"
   split: true
   shift: 'O'
+
 poverty:
   max_train: 1000
   max_test: 250
+  normalized_labels: true
+
 skin_lesion:
   max_train: 1000
   max_test: 250
+  normalized_labels: true
+
 histology_nuclei:
   max_train: 1000
   max_test: 250
+  normalized_labels: true
+
 iwildcam:
   max_train: 1000
   max_test: 250
