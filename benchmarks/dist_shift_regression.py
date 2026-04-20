@@ -35,12 +35,6 @@ from bayesian_scattering.utils.helpers import get_results
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # %%
-os.environ["DATA_PATH"] = f"{os.environ["SCRATCH"]}/data/datasets"
-os.environ["FEATURES_PATH"] = f"{os.environ["SCRATCH"]}/data/features"
-os.environ["RESULTS_PATH"] = f"{os.environ["SCRATCH"]}/data/results"
-os.environ["MODELS_PATH"] = f"{os.environ["SCRATCH"]}/data/models"
-
-# %%
 benchmark_id = "dist_shift_cut_skin_lesion"
 
 # %% [markdown]

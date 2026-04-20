@@ -37,11 +37,6 @@ from bayesian_scattering.utils.helpers import get_dataset, get_feature, get_mode
 torch.manual_seed(1337)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# %%
-os.environ["DATA_PATH"] =
-os.environ["FEATURES_PATH"] =
-os.environ["RESULTS_PATH"] =
-
 # %% [markdown]
 # ## Settings
 
@@ -119,7 +114,7 @@ for iter in range(cfg["bayesian_opt"]["n_iters"]):
         train_y.sub_(mu_y).div_(std_y)
     model = get_model(
         model_name=model_id,
-        data=TensorDataset(train_x,train_y),
+        data=TensorDataset(train_x, train_y),
         device=device,
         **cfg["models"][model_id],
     )

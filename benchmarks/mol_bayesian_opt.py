@@ -36,11 +36,6 @@ from bayesian_scattering.utils.helpers import get_regrets, get_aucs, plot_regret
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# %%
-os.environ["DATA_PATH"] =
-os.environ["FEATURES_PATH"] =
-os.environ["RESULTS_PATH"] =
-
 
 # %%
 def infer_dataset_id(log_name):
@@ -112,8 +107,9 @@ else:
         device=device,
         reps=5,
     )
-    print(f"Benchmark Time: {time.time()-t0}s")
-    results_path = Path(os.environ["RESULTS_PATH"]).joinpath(f"bayesian_opt_{cfg['datasets'][dataset]['max_train']}_{dataset}_{cfg['datasets'][dataset]['target'] if dataset=="qm9" else ""}_{datetime.now().strftime("%y_%m_%d_%H_%M")}.pkl")
+    print(f"Benchmark Time: {time.time() - t0}s")
+    results_path = Path(os.environ["RESULTS_PATH"]).joinpath(
+        f"bayesian_opt_{cfg['datasets'][dataset]['max_train']}_{dataset}_{cfg['datasets'][dataset]['target'] if dataset == "qm9" else ""}_{datetime.now().strftime("%y_%m_%d_%H_%M")}.pkl")
     with open(results_path, 'wb') as f:
         pickle.dump(benchmark_log, f)
 
@@ -138,6 +134,8 @@ def split_benchmark_log(benchmark_log, baseline_model="baseline"):
             model_logs[model] = {baseline_key: baseline_val}
         model_logs[model][key] = val
     return model_logs
+
+
 model_logs = split_benchmark_log(benchmark_log)
 
 # %% [markdown]

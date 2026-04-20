@@ -40,45 +40,39 @@ logging.getLogger().setLevel(logging.WARNING)
 torch.manual_seed(1337)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# %%
-os.environ["DATA_PATH"] = "/Users/bernardo/Documents/projects/bayesian-scattering/data/datasets"
-os.environ["FEATURES_PATH"] = "/Users/bernardo/Documents/projects/bayesian-scattering/data/features"
-os.environ["RESULTS_PATH"] = "/Users/bernardo/Documents/projects/bayesian-scattering/data/results"
-
-
 # %% [markdown]
 # ## Settings
 
 # %%
 dataset_id = "skin_lesion"
-feature_id = "timm_convnext_base"
-model_id = "la_reg_nonlinear"
-
-with open(files("benchmarks").joinpath("config.yaml")) as f:
-    cfg = yaml.load(f, Loader=yaml.FullLoader)
+feature_id = "scattering_inv_J5_L8"
+model_id = "gp_exact_reg_rbf"
 
 # %% [markdown]
 # ## Dataset
 
 # %%
 if dataset_id in ["iwildcam", "poverty"]:
-    data_path = Path(os.environ["DATA_PATH"]).joinpath("wilds")
+    data_path = Path(os.environ["DATASETS_PATH"]).joinpath("wilds")
 elif dataset_id in ["skin_lesion", "histology_nuclei"]:
-    data_path = Path(os.environ["DATA_PATH"]).joinpath("pixels")
+    data_path = Path(os.environ["DATASETS_PATH"]).joinpath("pixels")
 else:
-    data_path = Path(os.environ["DATA_PATH"]).joinpath(dataset_id)
+    data_path = Path(os.environ["DATASETS_PATH"]).joinpath(dataset_id)
 data_path.mkdir(parents=True, exist_ok=True)
+
+with open(files("configs").joinpath("datasets.yaml")) as f:
+    dataset_opts = yaml.load(f, Loader=yaml.FullLoader)[dataset_id]
 
 trainset, testset = get_dataset(
     dataset_name=dataset_id,
     store_path=data_path,
     device=device,
-    **cfg["datasets"][dataset_id],
+    **dataset_opts,
 )
-train_idx = torch.randperm(len(trainset))[:cfg["datasets"][dataset_id]["max_train"]] if cfg["datasets"][dataset_id]["max_train"] is not None else None
-test_idx = torch.randperm(len(testset))[:cfg["datasets"][dataset_id]["max_test"]] if cfg["datasets"][dataset_id]["max_test"] is not None else None
+train_idx = torch.randperm(len(trainset))[:dataset_opts["max_train"]] if dataset_opts["max_train"] is not None else None
+test_idx = torch.randperm(len(testset))[:dataset_opts["max_test"]] if dataset_opts["max_test"] is not None else None
 
-if cfg["train"]["normalized_labels"]:
+if dataset_opts["normalized_labels"]:
     trainset.normalized_labels(idx=train_idx)
 # x, y = next(iter(DataLoader(trainset, len(trainset))))
 # x.mean(dim=(0, 2, 3))
@@ -93,13 +87,16 @@ features_path_train, features_path_test = features_path.joinpath("train"), featu
 features_path_train.mkdir(parents=True, exist_ok=True)
 features_path_test.mkdir(parents=True, exist_ok=True)
 
+with open(files("configs").joinpath("features.yaml")) as f:
+    feature_opts = yaml.load(f, Loader=yaml.FullLoader)[feature_id]
+
 f_train = get_feature(
     feature_name=feature_id,
     store_path=features_path_train,
     dataset=trainset,
     indices=train_idx,
     device=device,
-    **cfg["features"][feature_id],
+    **feature_opts,
 )
 
 f_test = get_feature(
@@ -108,136 +105,30 @@ f_test = get_feature(
     dataset=testset,
     indices=test_idx,
     device=device,
-    **cfg["features"][feature_id],
-)
-
-# %%
-trainset[0][0].shape
-
-# %%
-f_train.dataset.transforms
-
-# %%
-f_train.dataset.features_from_sample(trainset[6025][0]).shape
-
-# %%
-f_train[0][0].shape
-
-# %%
-import torchvision
-for i, t in enumerate(f_train.dataset.transforms.transforms):
-    if isinstance(t, torchvision.transforms.Resize):
-        print(t.size)
-
-# %%
-torchvision.transforms.Compose()
-
-# %%
-import timm
-model = timm.create_model(
-    "vit_small_patch14_reg4_dinov2.lvd142m",
-    pretrained=True,
-    # features_only=True,
-    num_classes=0,  # remove classifier nn.Linear
-    in_chans=8,
-)
-model = model.eval()
-transforms = timm.data.create_transform(
-    **timm.data.resolve_model_data_config(model),
-    is_training=False
-)
-
-
-# %%
-model(transforms(x[0:2]))
-
-# %%
-transforms
-
-# %%
-trainset[0][0].numpy()
-
-# %%
-from torchvision import transforms
-transform = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-])
-
-# %%
-tmp = x[0]/255.
-
-# %%
-tmp.view(tmp.size(0), -1).mean(dim=1)
-
-# %%
-transform(x/255.).mean(dim=(0, 2, 3))
-
-# %%
-(x/255.).mean(dim=(0, 2, 3))
-
-# %%
-f_train.dataset.transforms
-
-# %%
-f_train.dataset.ws(f_train.dataset.transform(trainset[0][0][:3]))[0][0]
-
-# %%
-# %matplotlib widget
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-
-fig = plt.figure()
-ax = fig.add_subplot(111)
-
-for i in torch.randperm(len(f_test))[:2]:
-    neg_idx = f_train[i][0] < 0
-    y = f_train[i][0][neg_idx]
-    ax.plot(torch.arange(len(y)), y)
-plt.show()
-
-# %%
-fig = plt.figure()
-ax = fig.add_subplot(111)
-
-for i in torch.randperm(len(f_train))[:2]:
-    y = f_train[i][0]
-    ax.plot(torch.arange(len(y)), y)
-plt.show()
-
-# %%
-X_train = next(iter(Dataloader(f_trian, len(f_train)))
-X_test = next(iter(Dataloader(f_trian, len(f_test)))
-
-# %%
-fig = plt.figure()
-ax = fig.add_subplot(111)
-
-x = torch.arange(len(y))
-y = X_train.mean(axis=0)
-sigma = X_train.std(axis=0)
-
-ax.plot(x, y)
-ax.fill_between(
-    *[x, y - 2 * sigma, y + 2 * sigma],
-    alpha=0.2,
+    **feature_opts,
 )
 
 # %% [markdown]
 # ## Model
 
 # %%
+with open(files("configs").joinpath("models.yaml")) as f:
+    model_opts = yaml.load(f, Loader=yaml.FullLoader)[model_id]
+    
 model = get_model(
     model_name=model_id,
     data=f_train,
     device=device,
-    **cfg["models"][model_id],
+    **model_opts,
 )
 
 # %% [markdown]
 # ## Train
 
 # %%
+with open(files("configs").joinpath("train.yaml")) as f:
+    cfg = yaml.load(f, Loader=yaml.FullLoader)
+    
 loss = train_model(
     model=model,
     data=f_train,
@@ -253,10 +144,22 @@ test_loader = DataLoader(
     f_test,
     **cfg["dataloader"]
 )
-model.to(device)
 results_log = test_regression(
     model,
     test_loader,
-    labels_norm=trainset.labels_norm if cfg["train"]["normalized_labels"] else None
+    labels_norm=trainset.labels_norm if dataset_opts["normalized_labels"] else None
 )
-model.cpu()
+
+# %%
+results_log
+
+# %%
+results_log
+
+# %%
+results_log
+
+# %%
+results_log
+
+# %%

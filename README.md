@@ -70,17 +70,17 @@ Optionally, you can pair and sync the `.ipynb` and `.py` files to keep both upda
 ```sh
 jupytext --set-formats ipynb,py:percent <script>.ipynb
 ```
-To run either the examples or the benchmarks, you need to specify three paths in each script:
-```python
-os.environ["DATA_PATH"] =
-os.environ["FEATURES_PATH"] =
-os.environ["RESULTS_PATH"] =
+To run either the examples or the benchmarks, you need to specify three paths in env variables:
+```sh
+export DATASETS_PATH=<path/to/datasets>
+export FEATURES_PATH=<path/to/features>
+export RESULTS_PATH=<path/to/results>
 ```
 The first defines where the datasets are stored. The second defines where the generated features are stored, which avoids recomputing them every time you run a script. The third defines where the results are saved.
 
-Expected layout under `os.environ["DATA_PATH"]` for the pre-existing datasets:
+Expected layout under `DATASETS_PATH` for the pre-existing datasets:
 ```text
-DATA_PATH/
+DATASETS_PATH/
 ├── pixels/
 │   ├── skin_lesion/
 │   │   ├── images_train.pkl
@@ -96,7 +96,7 @@ DATA_PATH/
     └── poverty_v1.1/
 ```
 
-- `skin_lesion` should be located at `os.environ["DATA_PATH"]/pixels/skin_lesion`.
-- `histology_nuclei` should be located at `os.environ["DATA_PATH"]/pixels/histology_nuclei`.
-- The asset wealth dataset (`poverty`) should be located at `os.environ["DATA_PATH"]/wilds/poverty_v1.1`.
+- `skin_lesion` should be located at `$DATASETS_PATH/pixels/skin_lesion`.
+- `histology_nuclei` should be located at `$DATASETS_PATH/pixels/histology_nuclei`.
+- The asset wealth dataset (`poverty`) should be located at `$DATASETS_PATH/wilds/poverty_v1.1`.
 - `qm2` (QM2D) and `qm9` are generated or downloaded automatically when needed, so you do not need to prepare their folders manually.
