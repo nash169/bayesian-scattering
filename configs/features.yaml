@@ -22,7 +22,7 @@ scattering_cov_J4_L8:
   max_order: 2
   rot_invariant: false
 
-# skin_lesion - histology_nuclei J-1
+# skin_lesion - histology_nuclei J-1, poverty J-3
 scattering_inv_J5_L8:
   J: 5
   L: 8
@@ -34,7 +34,7 @@ scattering_cov_J5_L8:
   max_order: 2
   rot_invariant: false
 
-# poverty J-2
+# poverty J-2, qm2d J-3, iwildcam J-3
 scattering_inv_J6_L8:
   J: 6
   L: 8
@@ -46,7 +46,7 @@ scattering_cov_J6_L8:
   max_order: 2
   rot_invariant: false
 
-# poverty J-1
+# poverty J-1, qm2d J-2, iwildcam J-2
 scattering_inv_J7_L8:
   J: 7
   L: 8
@@ -58,7 +58,7 @@ scattering_cov_J7_L8:
   max_order: 2
   rot_invariant: false
 
-# qm2d J-1
+# qm2d J-1, iwildcam J-1
 scattering_inv_J8_L8:
   J: 8
   L: 8

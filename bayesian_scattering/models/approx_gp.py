@@ -5,6 +5,7 @@ import gpytorch
 from gpytorch.models import ApproximateGP
 from gpytorch.variational import CholeskyVariationalDistribution
 from gpytorch.variational import VariationalStrategy
+from gpytorch.distributions import MultivariateNormal
 from botorch.models.gpytorch import GPyTorchModel
 
 
@@ -35,4 +36,4 @@ class ApproxGP(ApproximateGP, GPyTorchModel):
     def forward(self, x):
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
-        return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+        return MultivariateNormal(mean_x, covar_x)

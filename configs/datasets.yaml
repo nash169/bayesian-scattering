@@ -41,5 +41,6 @@ histology_nuclei:
   normalized_labels: true
 
 iwildcam:
-  max_train: 1000
+  max_train: 100
   max_test: 250
+  normalized_labels: false

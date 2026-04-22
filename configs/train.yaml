@@ -2,7 +2,7 @@ train:
   epochs: 500
   tol: 1.0e-5
   patience: 100
-  verbose: false
+  verbose: true
 
 optimizer:
   lr: 1.0e-2

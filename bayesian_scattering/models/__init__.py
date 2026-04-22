@@ -5,6 +5,7 @@ from bayesian_scattering.models.baseline import Baseline
 from bayesian_scattering.models.laplace_approx import LaplaceApproximation
 from bayesian_scattering.models.mlp import MLP
 from bayesian_scattering.models.timm import TIMMRegression
+from bayesian_scattering.models.multitask_approx_gp import MultitaskApproxGP
 
 __all__ = [
     "ExactGP",
@@ -13,5 +14,6 @@ __all__ = [
     "Baseline",
     "LaplaceApproximation",
     "MLP",
-    "TIMMRegression"
+    "TIMMRegression",
+    "MultitaskApproxGP"
 ]
