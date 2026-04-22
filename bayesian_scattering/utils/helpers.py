@@ -170,9 +170,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
         model.initialize(**hypers)
     elif model_name.startswith("gp_approx_reg"):
         assert data is not None
-        inducing_points, _ = next(
-            iter(DataLoader(data, batch_size=kwargs.get("num_ip")))
-        )
+        inducing_points, _ = next(iter(DataLoader(data, batch_size=kwargs.get("num_ip"), shuffle=True)))
 
         kargs = kwargs.get("kernel").copy()
         if "ard_num_dims" in kargs and kargs["ard_num_dims"] == "auto":
@@ -195,7 +193,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             "covar_module.outputscale": 1.0,
         }
         model.initialize(**hypers)
-    elif model_name.startswith("ensemble_reg"):
+    elif model_name.startswith("ensemble_head_reg"):
         assert data is not None, "Missing data info"
         data_dim = data[0][0].shape[0]
         layers_func = dict(
@@ -211,7 +209,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             activation=layers_func[kwargs["activation"]] if "activation" in kwargs else None,
             features=layers_func[kwargs["features"]] if "features" in kwargs else None,
         ).to(device)
-    elif model_name.startswith("ensemble_timm_reg"):
+    elif model_name.startswith("ensemble_full_reg"):
         assert data is not None, "Missing data info"
         num_ch = data[0][0].shape[0]
         layers_func = dict(
@@ -228,7 +226,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             activation=layers_func[kwargs["activation"]] if "activation" in kwargs else None,
             features=layers_func[kwargs["features"]] if "features" in kwargs else None,
         )  # .to(device)
-    elif model_name.startswith("laplace"):
+    elif model_name.startswith("laplace_reg"):
         assert data is not None, "Missing training data."
         layers = kwargs.get("layers")
         if layers is None:
@@ -249,11 +247,57 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             prior_precision=kwargs.get("prior_precision"),
             pred_type=kwargs.get("pred_type", "glm"),
         )
-    elif model_name.startswith("baseline"):
+    elif model_name.startswith("baseline_reg"):
         assert data is not None, "Missing training data."
         train_y = next(iter(DataLoader(data, batch_size=len(data))))[1]
         train_y = train_y.to(device)
         model = Baseline(labels=train_y)
+    elif model_name.startswith("svgp_class"):
+        assert data is not None, "Missing training data."
+
+        num_classes = data.base.dataset.n_classes if hasattr(data, "base") else data.dataset.base.dataset.n_classes
+        inducing_points, _ = next(iter(DataLoader(data, batch_size=kwargs.get("num_ip"), shuffle=True)))
+
+        kargs = kwargs.get("kernel").copy()
+        kargs["batch_shape"] = torch.Size([num_classes])
+        if "ard_num_dims" in kargs and kargs["ard_num_dims"] == "auto":
+            kargs["ard_num_dims"] = inducing_points.shape[1]
+        if "lengthscale" in kargs and kargs["lengthscale"] == "auto":
+            kargs["lengthscale"] = average_distance(inducing_points)
+        kernel = gpytorch.kernels.ScaleKernel(
+            get_kernel(id=kargs.pop("id"), **kargs),
+            batch_shape=kargs["batch_shape"]
+        )
+
+        if num_classes > 2:
+            likelihood = gpytorch.likelihoods.SoftmaxLikelihood(
+                num_classes=num_classes,
+                mixing_weights=False,    # treat each latent GP as a class logit
+            )
+        else:
+            likelihood = gpytorch.likelihoods.BernoulliLikelihood()
+
+        model = MultitaskApproxGP(
+            inducing_points,
+            num_classes,
+            likelihood,
+            kernel
+        ).to(device)
+
+        hypers = {
+            "covar_module.outputscale": 1.0,
+        }
+        model.initialize(**hypers)
+    elif model_name.startswith("headens_class"):
+        raise NotImplementedError("Model not implemented yet.")
+    elif model_name.startswith("fullens_class"):
+        raise NotImplementedError("Model not implemented yet.")
+    elif model_name.startswith("la_class"):
+        raise NotImplementedError("Model not implemented yet.")
+    elif model_name.startswith("base_class"):
+        raise NotImplementedError("Model not implemented yet.")
+    else:
+        raise ValueError("Model not available.")
 
     return model
 
@@ -300,7 +344,7 @@ def train_model(model, data, cfg, device):
             data,
             **cfg["dataloader"]
         )
-        if isinstance(model, ApproxGP):
+        if isinstance(model, ApproxGP) or isinstance(model, MultitaskApproxGP):
             optimizer = torch.optim.Adam(
                 model.parameters(),
                 # **cfg["optimizer"],
