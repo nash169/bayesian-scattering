@@ -124,3 +124,20 @@ ensemble_timm_reg_dinov2_base:
   num_models: 5
   layers: [128]
   activation: tanh
+
+# Multiclass GP Approx RBF Kernel
+svgp_class_rbf:
+  num_ip: 10
+  noise_var: 1e-2
+  signal_var: 1.0
+  kernel:
+    id: rbf
+    lengthscale: auto
+svgp_class_rbf_ard:
+  num_ip: 10
+  noise_var: 1e-2
+  signal_var: 1.0
+  kernel:
+    id: rbf
+    lengthscale: auto
+    ard_num_dims: auto
