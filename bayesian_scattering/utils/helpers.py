@@ -35,9 +35,7 @@ def get_dataset(dataset_name, store_path, device=torch.device("cpu"), **kwargs):
         fullset = QM9(store_path=store_path, **kwargs).to(device)
         if kwargs["split"]:
             atoms = dict(H=1, C=6, O=8, N=7, S=16, F=9)
-            atom_mask = torch.any(
-                fullset.full_charges == atoms[kwargs["shift"]], axis=1
-            )
+            atom_mask = torch.any(fullset.full_charges == atoms[kwargs["shift"]], axis=1)
             trainset = Subset(fullset, torch.nonzero(~atom_mask))
             testset = Subset(fullset, torch.nonzero(~atom_mask))
         else:
@@ -74,6 +72,45 @@ def get_feature(
         if isinstance(dataset, QM2) or isinstance(dataset, QM9):
             dataset.unimol = False
 
+        transforms = None
+
+        if isinstance(dataset, Pixels):
+            transforms = T.Compose(
+                [
+                    T.Resize(
+                        size=224,
+                        interpolation=T.InterpolationMode.BICUBIC,
+                        max_size=None,
+                        antialias=True,
+                    ),
+                ]
+            )
+            if dataset.dataset_name == "skin_lesion":
+                transforms.transforms.append(
+                    T.Normalize(
+                        mean=torch.tensor([0.5602, 0.5328, 0.7694]),
+                        std=torch.tensor([0.1736, 0.1547, 0.1469]),
+                    ),
+                )
+            if dataset.dataset_name == "histology_nuclei":
+                transforms.transforms.append(
+                    T.Normalize(
+                        mean=torch.tensor([0.7317, 0.5654, 0.7403]),
+                        std=torch.tensor([0.1864, 0.2278, 0.1995]),
+                    ),
+                )
+
+        if isinstance(dataset, WILDS):
+            if dataset.dataset.dataset_name == "poverty":
+                transforms = T.Compose(
+                    [
+                        T.Normalize(
+                            mean=torch.tensor([-0.0785, -0.0771, -0.0568, -0.0067, -0.0054, -0.0877, -0.0280, 0.1652]),
+                            std=torch.tensor([0.9741, 0.9600, 0.9612, 0.9829, 0.9944, 0.9725, 0.9967, 1.1939]),
+                        ),
+                    ]
+                )
+
         feature = WaveletScattering(
             store_path=store_path, dataset=dataset, **kwargs
         ).to(device)
@@ -92,23 +129,34 @@ def get_feature(
                         max_size=None,
                         antialias=True,
                     ),
-                    T.Normalize(
-                        mean=torch.tensor([0.4850, 0.4560, 0.4060]),
-                        std=torch.tensor([0.2290, 0.2240, 0.2250]),
-                    ),
                 ]
             )
+            if dataset.dataset_name == "skin_lesion":
+                transforms.transforms.append(
+                    T.Normalize(
+                        mean=torch.tensor([0.5602, 0.5328, 0.7694]),
+                        std=torch.tensor([0.1736, 0.1547, 0.1469]),
+                    ),
+                )
+            if dataset.dataset_name == "histology_nuclei":
+                transforms.transforms.append(
+                    T.Normalize(
+                        mean=torch.tensor([0.7317, 0.5654, 0.7403]),
+                        std=torch.tensor([0.1864, 0.2278, 0.1995]),
+                    ),
+                )
 
-        if isinstance(dataset, WILDS) and dataset.dataset.dataset_name == "poverty":
-            transforms = T.Compose(
-                [
-                    Grayscale(),
-                    T.Normalize(
-                        mean=torch.tensor([0.4850, 0.4560, 0.4060]),
-                        std=torch.tensor([0.2290, 0.2240, 0.2250]),
-                    ),
-                ]
-            )
+        if isinstance(dataset, WILDS):
+            if dataset.dataset.dataset_name == "poverty":
+                transforms = T.Compose(
+                    [
+                        Grayscale(),
+                        T.Normalize(
+                            mean=torch.tensor([-0.0785, -0.0771, -0.0568, -0.0067, -0.0054, -0.0877, -0.0280, 0.1652]),
+                            std=torch.tensor([0.9741, 0.9600, 0.9612, 0.9829, 0.9944, 0.9725, 0.9967, 1.1939]),
+                        ),
+                    ]
+                )
 
         feature = TorchImageModel(
             store_path=store_path, dataset=dataset, transforms=transforms, **kwargs
