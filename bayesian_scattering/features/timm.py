@@ -26,10 +26,6 @@ class TorchImageModel(AbstractFeatures):
             num_classes=0,  # remove classifier nn.Linear
         )
         self.model = self.model.eval()
-        # self.transforms = timm.data.create_transform(
-        #     **timm.data.resolve_model_data_config(self.model),
-        #     is_training=False
-        # )
 
         super().__init__(
             dataset=dataset,
@@ -40,6 +36,12 @@ class TorchImageModel(AbstractFeatures):
             dtype=dtype,
         )
 
+        if self.transforms is None:
+            self.transforms = timm.data.create_transform(
+                **timm.data.resolve_model_data_config(self.model),
+                is_training=False
+            )
+
     def features_from_sample(self, x: torch.Tensor) -> torch.Tensor:
         # num_ch = x.shape[0] if len(x.shape) == 3 else x.shape[1]
         # if num_ch > 3:
@@ -48,14 +50,16 @@ class TorchImageModel(AbstractFeatures):
         # else:
         #     x_in = x.to(self.device)
 
-        y = self.transforms(x).to(self.device)
-        if len(y.shape) == 3:
-            y = y.unsqueeze(0)
-
-        with torch.no_grad():
-            y = self.model(y)
-
-        return y.flatten() if len(x.shape) == 3 else y.reshape(x.shape[0], -1)
+        # y = self.transforms(x).to(self.device)
+        # if len(y.shape) == 3:
+        #     y = y.unsqueeze(0)
+        #
+        # with torch.no_grad():
+        #     y = self.model(y)
+        #
+        # return y.flatten() if len(x.shape) == 3 else y.reshape(x.shape[0], -1)
+        x = self.transforms(x).to(self.device) if self.transforms is not None else x.to(self.device)
+        return self.model(x).flatten()
 
     def to(self, device) -> Self:
         self.device = device
