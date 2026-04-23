@@ -27,6 +27,7 @@ class Pixels(AbstractDataset):
             with open(dataset_path.joinpath(f'{dataset_name}/labels_test.pkl'), 'rb') as f_y:
                 self.labels = torch.from_numpy(pickle.load(f_y)).float().contiguous()
 
+        self.dataset_name = dataset_name
         self.device = torch.device("cpu")
 
     def __len__(self):

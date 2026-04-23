@@ -54,7 +54,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # %%
 dataset_id = "iwildcam"
-feature_id = "scattering_inv_J8_L8"
+feature_id = "timm_convnext_atto"
 model_id = "svgp_class_rbf"
 
 # %% [markdown]
@@ -113,9 +113,6 @@ test_idx = (
     if dataset_opts["max_test"] is not None
     else None
 )
-
-if dataset_opts["normalized_labels"]:
-    trainset.normalized_labels(idx=train_idx)
 
 # %% [markdown]
 # ## Features

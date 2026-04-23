@@ -29,18 +29,24 @@ poverty:
   max_train: 1000
   max_test: 250
   normalized_labels: true
+  mean: [-0.0785, -0.0771, -0.0568, -0.0067, -0.0054, -0.0877, -0.0280,  0.1652]
+  std: [0.9741, 0.9600, 0.9612, 0.9829, 0.9944, 0.9725, 0.9967, 1.1939]
 
 skin_lesion:
   max_train: 1000
   max_test: 250
   normalized_labels: true
+  mean: [0.5602, 0.5328, 0.7694]
+  std: [0.1736, 0.1547, 0.1469]
 
 histology_nuclei:
   max_train: 1000
   max_test: 250
   normalized_labels: true
+  mean: [0.7317, 0.5654, 0.7403]
+  std: [0.1864, 0.2278, 0.1995]
 
 iwildcam:
-  max_train: 100
-  max_test: 10
+  max_train: 1000
+  max_test: 250
   normalized_labels: false

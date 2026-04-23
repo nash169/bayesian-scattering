@@ -90,15 +90,15 @@ scattering_inv_3D_J4_L3:
   points: null
   integral_powers: [0.5, 1.0, 2.0, 3.0, 4.0]
 
-timm_convnext_base:
-  pretrained_model: "convnext_base.fb_in1k"
 timm_convnext_atto:
   pretrained_model: "convnext_atto.d2_in1k"
+timm_convnext_base:
+  pretrained_model: "convnext_base.fb_in1k"
 
-timm_convnextv2_base:
-  pretrained_model: "convnextv2_base.fcmae_ft_in1k"
 timm_convnextv2_atto:
   pretrained_model: "convnextv2_atto.fcmae_ft_in1k"
+timm_convnextv2_base:
+  pretrained_model: "convnextv2_base.fcmae_ft_in1k"
 
 timm_dinov2_small:
   pretrained_model: "vit_small_patch14_reg4_dinov2.lvd142m"

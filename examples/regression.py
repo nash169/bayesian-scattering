@@ -44,12 +44,28 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # ## Settings
 
 # %%
-dataset_id = "skin_lesion"
-feature_id = "scattering_inv_J5_L8"
-model_id = "gp_exact_reg_rbf"
+dataset_id = "histology_nuclei"
+feature_id = "timm_convnext_atto"
+model_id = "gp_reg_rbf"
 
 # %% [markdown]
-# ## Dataset
+# ## Configs
+
+# %%
+with open(files("configs").joinpath("datasets.yaml")) as f:
+    dataset_opts = yaml.load(f, Loader=yaml.FullLoader)[dataset_id]
+
+with open(files("configs").joinpath("features.yaml")) as f:
+    feature_opts = yaml.load(f, Loader=yaml.FullLoader)[feature_id]
+
+with open(files("configs").joinpath("models.yaml")) as f:
+    model_opts = yaml.load(f, Loader=yaml.FullLoader)[model_id]
+
+with open(files("configs").joinpath("train.yaml")) as f:
+    cfg = yaml.load(f, Loader=yaml.FullLoader)
+
+# %% [markdown]
+# ## Paths
 
 # %%
 if dataset_id in ["iwildcam", "poverty"]:
@@ -60,9 +76,15 @@ else:
     data_path = Path(os.environ["DATASETS_PATH"]).joinpath(dataset_id)
 data_path.mkdir(parents=True, exist_ok=True)
 
-with open(files("configs").joinpath("datasets.yaml")) as f:
-    dataset_opts = yaml.load(f, Loader=yaml.FullLoader)[dataset_id]
+features_path = Path(os.environ["FEATURES_PATH"]).joinpath(dataset_id)
+features_path_train, features_path_test = features_path.joinpath("train"), features_path.joinpath("test")
+features_path_train.mkdir(parents=True, exist_ok=True)
+features_path_test.mkdir(parents=True, exist_ok=True)
 
+# %% [markdown]
+# ## Dataset
+
+# %%
 trainset, testset = get_dataset(
     dataset_name=dataset_id,
     store_path=data_path,
@@ -74,22 +96,20 @@ test_idx = torch.randperm(len(testset))[:dataset_opts["max_test"]] if dataset_op
 
 if dataset_opts["normalized_labels"]:
     trainset.normalized_labels(idx=train_idx)
+
+# %% [raw]
 # x, y = next(iter(DataLoader(trainset, len(trainset))))
+
+# %% [raw]
 # x.mean(dim=(0, 2, 3))
+
+# %% [raw]
 # x.std(dim=(0, 2, 3))
 
 # %% [markdown]
 # ## Features
 
 # %%
-features_path = Path(os.environ["FEATURES_PATH"]).joinpath(dataset_id)
-features_path_train, features_path_test = features_path.joinpath("train"), features_path.joinpath("test")
-features_path_train.mkdir(parents=True, exist_ok=True)
-features_path_test.mkdir(parents=True, exist_ok=True)
-
-with open(files("configs").joinpath("features.yaml")) as f:
-    feature_opts = yaml.load(f, Loader=yaml.FullLoader)[feature_id]
-
 f_train = get_feature(
     feature_name=feature_id,
     store_path=features_path_train,
@@ -112,9 +132,6 @@ f_test = get_feature(
 # ## Model
 
 # %%
-with open(files("configs").joinpath("models.yaml")) as f:
-    model_opts = yaml.load(f, Loader=yaml.FullLoader)[model_id]
-
 model = get_model(
     model_name=model_id,
     data=f_train,
@@ -126,9 +143,6 @@ model = get_model(
 # ## Train
 
 # %%
-with open(files("configs").joinpath("train.yaml")) as f:
-    cfg = yaml.load(f, Loader=yaml.FullLoader)
-
 loss = train_model(
     model=model,
     data=f_train,

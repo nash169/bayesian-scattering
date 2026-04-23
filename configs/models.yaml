@@ -1,30 +1,28 @@
-baseline_reg:
+# Regression Baseline
+base_reg:
   noise_var: 1e-2
 
-base_class:
-  noise_var: 1e-2
-
-# GP Linear Kernel
-gp_exact_reg_lin:
+# Regression GP Linear Kernel
+gp_reg_lin:
   noise_var: 1e-2
   signal_var: 1.0
   kernel:
     id: linear
-gp_exact_reg_lin_ard:
+gp_reg_lin_ard:
   noise_var: 1e-2
   signal_var: 1.0
   kernel:
     id: linear
     ard_num_dims: auto
 
-# GP RBF Kernel
-gp_exact_reg_rbf:
+# Regression GP RBF Kernel
+gp_reg_rbf:
   noise_var: 1e-2
   signal_var: 1.0
   kernel:
     id: rbf
     lengthscale: auto
-gp_exact_reg_rbf_ard:
+gp_reg_rbf_ard:
   noise_var: 1e-2
   signal_var: 1.0
   kernel:
@@ -32,15 +30,15 @@ gp_exact_reg_rbf_ard:
     lengthscale: auto
     ard_num_dims: auto
 
-# GP Matern 5/2 Kernel
-gp_exact_reg_matern52:
+# Regression GP Matern 5/2 Kernel
+gp_reg_matern52:
   noise_var: 1e-2
   signal_var: 1.0
   kernel: 
     id: matern
     nu: 2.5
     lengthscale: auto
-gp_exact_reg_matern52_ard:
+gp_reg_matern52_ard:
   noise_var: 1e-2
   signal_var: 1.0
   kernel: 
@@ -49,15 +47,15 @@ gp_exact_reg_matern52_ard:
     lengthscale: auto
     ard_num_dims: auto
 
-# GP Approx RBF Kernel
-gp_approx_reg_rbf:
+# Regression SVGP RBF Kernel
+svgp_reg_rbf:
   num_ip: 100
   noise_var: 1e-2
   signal_var: 1.0
   kernel:
     id: rbf
     lengthscale: auto
-gp_approx_reg_rbf_ard:
+svgp_reg_rbf_ard:
   num_ip: 100
   noise_var: 1e-2
   signal_var: 1.0
@@ -66,8 +64,8 @@ gp_approx_reg_rbf_ard:
     lengthscale: auto
     ard_num_dims: auto
 
-# GP Approx Matern 5/2 Kernel
-gp_approx_reg_matern52:
+# Regression SVGP Matern 5/2 Kernel
+svgp_reg_matern52:
   num_ip: 100
   noise_var: 1e-2
   signal_var: 1.0
@@ -75,7 +73,7 @@ gp_approx_reg_matern52:
     id: matern
     nu: 2.5
     lengthscale: auto
-gp_approx_reg_matern52_ard:
+svgp_reg_matern52_ard:
   num_ip: 100
   noise_var: 1e-2
   signal_var: 1.0
@@ -85,7 +83,39 @@ gp_approx_reg_matern52_ard:
     lengthscale: auto
     ard_num_dims: auto
 
-# Laplace Approximation
+# Regression Head Deep Ensemble
+headens_reg_linear:
+  num_models: 10
+  # features: layer_norm
+headens_reg_nonlinear:
+  num_models: 10
+  layers: [128]
+  activation: tanh
+  # features: layer_norm
+
+# Regression Full Deep Ensemble
+fullens_reg_convnext_atto:
+  features_model: "convnextv2_atto.fcmae_ft_in1k"
+  num_models: 5
+  layers: [128]
+  activation: tanh
+fullens_reg_convnext_base:
+  features_model: "convnext_base.fb_in1k"
+  num_models: 5
+  layers: [128]
+  activation: tanh
+fullens_reg_dinov2_small:
+  features_model: "vit_small_patch14_reg4_dinov2.lvd142m"
+  num_models: 5
+  layers: [128]
+  activation: tanh
+fullens_reg_dinov2_base:
+  features_model: "vit_base_patch14_reg4_dinov2.lvd142m"
+  num_models: 5
+  layers: [128]
+  activation: tanh
+
+# Regression Laplace Approximation
 la_reg_nonlinear:
   layers: [128]
   activation: tanh
@@ -94,59 +124,24 @@ la_reg_nonlinear:
   hessian_structure: diag
   pred_type: glm
 
-la_class_nonlinear:
-  layers: [128]
-  activation: tanh
-  subset_of_weights: last_layer
-  hessian_structure: diag
-  pred_type: glm
-  link_approx: mc
-  n_samples: 100
 
-# Features Deep Ensemble
-ensemble_reg_linear:
-  num_models: 10
-  # features: layer_norm
-ensemble_reg_nonlinear:
-  num_models: 10
-  layers: [128]
-  activation: tanh
-  # features: layer_norm
+# -----------------------------------------------------
 
-# Convnext Deep Ensemble
-ensemble_timm_reg_convnext_atto:
-  features_model: "convnextv2_atto.fcmae_ft_in1k"
-  num_models: 5
-  layers: [128]
-  activation: tanh
-ensemble_timm_reg_convnext_base:
-  features_model: "convnext_base.fb_in1k"
-  num_models: 5
-  layers: [128]
-  activation: tanh
 
-# Dino Deep Ensemble
-ensemble_timm_reg_dinov2_small:
-  features_model: "vit_small_patch14_reg4_dinov2.lvd142m"
-  num_models: 5
-  layers: [128]
-  activation: tanh
-ensemble_timm_reg_dinov2_base:
-  features_model: "vit_base_patch14_reg4_dinov2.lvd142m"
-  num_models: 5
-  layers: [128]
-  activation: tanh
+# Classification Baseline
+base_class:
+  noise_var: 1e-2
 
-# Multiclass GP Approx RBF Kernel
+# Classification SVGP RBF Kernel
 svgp_class_rbf:
-  num_ip: 10
+  num_ip: 100
   noise_var: 1e-2
   signal_var: 1.0
   kernel:
     id: rbf
     lengthscale: auto
 svgp_class_rbf_ard:
-  num_ip: 10
+  num_ip: 100
   noise_var: 1e-2
   signal_var: 1.0
   kernel:
@@ -154,13 +149,32 @@ svgp_class_rbf_ard:
     lengthscale: auto
     ard_num_dims: auto
 
-# Head Ensemble Classifier
+# Classification SVGP Matern 5/2 Kernel
+svgp_class_matern52:
+  num_ip: 100
+  noise_var: 1e-2
+  signal_var: 1.0
+  kernel:
+    id: matern
+    nu: 2.5
+    lengthscale: auto
+svgp_class_matern52_ard:
+  num_ip: 100
+  noise_var: 1e-2
+  signal_var: 1.0
+  kernel:
+    id: matern
+    nu: 2.5
+    lengthscale: auto
+    ard_num_dims: auto
+
+# Classification Head Ensemble
 headens_class:
   num_models: 10
   layers: [128]
   activation: tanh
 
-# Full-model Ensemble Classifier
+# Classification Full Ensemble
 fullens_class_convnext_atto:
   features_model: "convnextv2_atto.fcmae_ft_in1k"
   num_models: 5
@@ -173,3 +187,13 @@ fullens_class_dinov2_small:
 fullens_class_dinov2_base:
   features_model: "vit_base_patch14_reg4_dinov2.lvd142m"
   num_models: 5
+
+# Classification Laplace Approximation
+la_class_nonlinear:
+  layers: [128]
+  activation: tanh
+  subset_of_weights: last_layer
+  hessian_structure: diag
+  pred_type: glm
+  link_approx: mc
+  n_samples: 100
