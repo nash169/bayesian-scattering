@@ -11,6 +11,14 @@ from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 
 
+def _compute_mlp_loss(
+    loss_fn: Callable, y_pred: torch.Tensor, y_true: torch.Tensor
+) -> torch.Tensor:
+    if isinstance(loss_fn, torch.nn.CrossEntropyLoss):
+        return loss_fn(y_pred, y_true.long().reshape(-1))
+    return loss_fn(y_pred, y_true.reshape(y_pred.shape))
+
+
 def train_exact_gp(
     model,
     optimizer,
@@ -19,7 +27,7 @@ def train_exact_gp(
     tol=1e-2,
     patience=10,
     verbose=False,
-    **kwargs
+    **kwargs,
 ):
     model.train()
     model.likelihood.train()
@@ -79,12 +87,14 @@ def train_approx_gp(
     tol=1e-2,
     patience=10,
     verbose=False,
-    **kwargs
+    **kwargs,
 ):
     device = next(model.parameters()).device
     model.train()
     model.likelihood.train()
-    mll = gpytorch.mlls.VariationalELBO(model.likelihood, model, num_data=len(data_loader.dataset))
+    mll = gpytorch.mlls.VariationalELBO(
+        model.likelihood, model, num_data=len(data_loader.dataset)
+    )
 
     curr_loss = 1e6
     count_patience = 0
@@ -180,7 +190,7 @@ def train_mlp(
     tol: float = 1e-2,
     patience: int = 10,
     verbose: bool = False,
-    **kwargs
+    **kwargs,
 ):
     device = next(model.parameters()).device
     model.train()
@@ -195,7 +205,7 @@ def train_mlp(
         for epoch in epochs_iter:
             optimizer.zero_grad()
             y_pred = model(x_train)
-            loss = loss_fn(y_pred, y_train.reshape(y_pred.shape))
+            loss = _compute_mlp_loss(loss_fn, y_pred, y_train)
             if verbose:
                 epochs_iter.set_postfix(
                     {
@@ -228,7 +238,7 @@ def train_mlp(
                 optimizer.zero_grad()
                 x_batch, y_batch = x_batch.to(device), y_batch.to(device)
                 y_pred = model(x_batch)
-                loss = loss_fn(y_pred, y_batch.reshape(y_pred.shape))
+                loss = _compute_mlp_loss(loss_fn, y_pred, y_batch)
                 if verbose:
                     epochs_iter.set_postfix(loss=loss.item())
                 loss.backward()

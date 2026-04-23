@@ -14,6 +14,7 @@ class LaplaceApproximation(nn.Module):
         self,
         model,
         dim=None,
+        likelihood="regression",
         subset_of_weights="all",
         hessian_structure="full",
         noise_var=1e-2,
@@ -28,6 +29,8 @@ class LaplaceApproximation(nn.Module):
 
         self.model = model
         self.dim = dim
+        self.likelihood_type = likelihood
+        self.is_class = likelihood == "classification"
         self.pred_type = pred_type
         self.link_approx = link_approx
         self.n_samples = n_samples
@@ -37,6 +40,8 @@ class LaplaceApproximation(nn.Module):
         param = next(self.model.parameters(), None)
         dtype = param.dtype if param is not None else torch.float32
         device = param.device if param is not None else torch.device("cpu")
+        if isinstance(noise_var, str):
+            noise_var = float(noise_var)
         self.register_buffer(
             "_noise_var", torch.as_tensor(noise_var, dtype=dtype, device=device)
         )
@@ -44,13 +49,14 @@ class LaplaceApproximation(nn.Module):
         self._laplace_kwargs = dict(
             subset_of_weights=subset_of_weights,
             hessian_structure=hessian_structure,
-            sigma_noise=self.noise_var.sqrt(),
             **kwargs,
         )
+        if not self.is_class:
+            self._laplace_kwargs["sigma_noise"] = self.noise_var.sqrt()
         if prior_precision is not None:
             self._laplace_kwargs["prior_precision"] = prior_precision
 
-        self.la = Laplace(self.model, "regression", **self._laplace_kwargs)
+        self.la = Laplace(self.model, likelihood, **self._laplace_kwargs)
 
     @property
     def noise_var(self):
@@ -115,6 +121,8 @@ class LaplaceApproximation(nn.Module):
 
     def forward(self, x, **kwargs):
         posterior = self.posterior(x, **kwargs)
+        if self.is_class:
+            return posterior
         return posterior.mean.unsqueeze(-1)
 
     def posterior(self, x, joint=False, pred_type=None, n_samples=None):
@@ -137,6 +145,9 @@ class LaplaceApproximation(nn.Module):
             predictive_kwargs["diagonal_output"] = not joint
         if self.link_approx is not None:
             predictive_kwargs["link_approx"] = self.link_approx
+
+        if self.is_class:
+            return self.la(x, **predictive_kwargs)
 
         mean, variance = self.la(x, **predictive_kwargs)
         mean = self._flatten_scalar_output(mean)

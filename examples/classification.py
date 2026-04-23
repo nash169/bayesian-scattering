@@ -33,8 +33,17 @@ import yaml
 from torch.utils.data import DataLoader
 
 sys.path.insert(0, os.path.abspath(os.path.join("../")))
-from bayesian_scattering.utils import test_regression, train_approx_gp, train_exact_gp
-from bayesian_scattering.utils.benchmark import get_dataset, get_feature, get_model, train_model
+from bayesian_scattering.utils import (
+    test_classification,
+    train_approx_gp,
+    train_exact_gp,
+)
+from bayesian_scattering.utils.benchmark import (
+    get_dataset,
+    get_feature,
+    get_model,
+    train_model,
+)
 
 logging.getLogger().setLevel(logging.WARNING)
 torch.manual_seed(1337)
@@ -77,7 +86,10 @@ else:
 data_path.mkdir(parents=True, exist_ok=True)
 
 features_path = Path(os.environ["FEATURES_PATH"]).joinpath(dataset_id)
-features_path_train, features_path_test = features_path.joinpath("train"), features_path.joinpath("test")
+features_path_train, features_path_test = (
+    features_path.joinpath("train"),
+    features_path.joinpath("test"),
+)
 features_path_train.mkdir(parents=True, exist_ok=True)
 features_path_test.mkdir(parents=True, exist_ok=True)
 
@@ -91,8 +103,16 @@ trainset, testset = get_dataset(
     device=device,
     **dataset_opts,
 )
-train_idx = torch.randperm(len(trainset))[:dataset_opts["max_train"]] if dataset_opts["max_train"] is not None else None
-test_idx = torch.randperm(len(testset))[:dataset_opts["max_test"]] if dataset_opts["max_test"] is not None else None
+train_idx = (
+    torch.randperm(len(trainset))[: dataset_opts["max_train"]]
+    if dataset_opts["max_train"] is not None
+    else None
+)
+test_idx = (
+    torch.randperm(len(testset))[: dataset_opts["max_test"]]
+    if dataset_opts["max_test"] is not None
+    else None
+)
 
 if dataset_opts["normalized_labels"]:
     trainset.normalized_labels(idx=train_idx)
@@ -134,29 +154,19 @@ model = get_model(
 # ## Train
 
 # %%
-loss = train_model(
-    model=model,
-    data=f_train,
-    cfg=cfg,
-    device=device
-)
-
-# %%
-f_train[0][0].shape
+loss = train_model(model=model, data=f_train, cfg=cfg, device=device)
 
 # %% [markdown]
 # ## Test
 
 # %%
-test_loader = DataLoader(
-    f_test,
-    **cfg["dataloader"]
-)
-results_log = test_regression(
+test_loader = DataLoader(f_test, **cfg["dataloader"])
+results_log = test_classification(
     model,
     test_loader,
-    labels_norm=trainset.labels_norm if dataset_opts["normalized_labels"] else None
 )
 
 # %%
 results_log
+
+# %%

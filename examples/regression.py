@@ -114,7 +114,7 @@ f_test = get_feature(
 # %%
 with open(files("configs").joinpath("models.yaml")) as f:
     model_opts = yaml.load(f, Loader=yaml.FullLoader)[model_id]
-    
+
 model = get_model(
     model_name=model_id,
     data=f_train,
@@ -128,7 +128,7 @@ model = get_model(
 # %%
 with open(files("configs").joinpath("train.yaml")) as f:
     cfg = yaml.load(f, Loader=yaml.FullLoader)
-    
+
 loss = train_model(
     model=model,
     data=f_train,
@@ -149,15 +149,6 @@ results_log = test_regression(
     test_loader,
     labels_norm=trainset.labels_norm if dataset_opts["normalized_labels"] else None
 )
-
-# %%
-results_log
-
-# %%
-results_log
-
-# %%
-results_log
 
 # %%
 results_log

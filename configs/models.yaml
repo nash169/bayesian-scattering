@@ -1,4 +1,7 @@
-baseline:
+baseline_reg:
+  noise_var: 1e-2
+
+base_class:
   noise_var: 1e-2
 
 # GP Linear Kernel
@@ -91,6 +94,15 @@ la_reg_nonlinear:
   hessian_structure: diag
   pred_type: glm
 
+la_class_nonlinear:
+  layers: [128]
+  activation: tanh
+  subset_of_weights: last_layer
+  hessian_structure: diag
+  pred_type: glm
+  link_approx: mc
+  n_samples: 100
+
 # Features Deep Ensemble
 ensemble_reg_linear:
   num_models: 10
@@ -141,3 +153,23 @@ svgp_class_rbf_ard:
     id: rbf
     lengthscale: auto
     ard_num_dims: auto
+
+# Head Ensemble Classifier
+headens_class:
+  num_models: 10
+  layers: [128]
+  activation: tanh
+
+# Full-model Ensemble Classifier
+fullens_class_convnext_atto:
+  features_model: "convnextv2_atto.fcmae_ft_in1k"
+  num_models: 5
+fullens_class_convnext_base:
+  features_model: "convnext_base.fb_in1k"
+  num_models: 5
+fullens_class_dinov2_small:
+  features_model: "vit_small_patch14_reg4_dinov2.lvd142m"
+  num_models: 5
+fullens_class_dinov2_base:
+  features_model: "vit_base_patch14_reg4_dinov2.lvd142m"
+  num_models: 5
