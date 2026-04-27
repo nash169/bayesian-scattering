@@ -99,7 +99,7 @@ def benchmark_regression(dataset_id, models, features, cfg, device):
                     **models_opts[model_id],
                 )
 
-                if "baseline" not in model_id:
+                if "base" not in model_id:
                     loss = train_model(
                         model=model,
                         data=f_train,
@@ -193,7 +193,7 @@ def benchmark_bayesian_opt(dataset_id, models, features, cfg, device, reps=1):
                 if curr_key not in benchmark_log:
                     benchmark_log[curr_key] = []
 
-                if "baseline" in model_id:
+                if "base" in model_id:
                     benchmark_log[curr_key].append(
                         get_regrets(
                             rnd_idx,
