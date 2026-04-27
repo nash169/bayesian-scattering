@@ -12,13 +12,13 @@ from bayesian_scattering.features.abstract_features import AbstractFeatures
 class TorchImageModel(AbstractFeatures):
     def __init__(
         self,
-        pretrained_model='convnext_base.fb_in1k',
+        pretrained_model="convnext_base.fb_in1k",
         store_path=None,
         dataset: Optional[AbstractDataset] = None,
         transforms: Optional[torchvision.transforms.Compose] = None,
         shard_size: int = 5_000,
         dtype=np.float32,
-        **kwargs
+        **kwargs,
     ):
         self.model = timm.create_model(
             pretrained_model,
@@ -38,28 +38,23 @@ class TorchImageModel(AbstractFeatures):
 
         if self.transforms is None:
             self.transforms = timm.data.create_transform(
-                **timm.data.resolve_model_data_config(self.model),
-                is_training=False
+                **timm.data.resolve_model_data_config(self.model), is_training=False
             )
 
     def features_from_sample(self, x: torch.Tensor) -> torch.Tensor:
-        # num_ch = x.shape[0] if len(x.shape) == 3 else x.shape[1]
-        # if num_ch > 3:
-        #     x_in = x.to(self.device).reshape(-1, *x.shape[-2:])
-        #     x_in = x_in.unsqueeze(1).repeat(1, 3, *([1] * len(x.shape[-2:])))
-        # else:
-        #     x_in = x.to(self.device)
+        x = (
+            self.transforms(x).to(self.device)
+            if self.transforms is not None
+            else x.to(self.device)
+        )
+        single_sample = x.ndim == 3
+        if single_sample:
+            x = x.unsqueeze(0)
 
-        # y = self.transforms(x).to(self.device)
-        # if len(y.shape) == 3:
-        #     y = y.unsqueeze(0)
-        #
-        # with torch.no_grad():
-        #     y = self.model(y)
-        #
-        # return y.flatten() if len(x.shape) == 3 else y.reshape(x.shape[0], -1)
-        x = self.transforms(x).to(self.device) if self.transforms is not None else x.to(self.device)
-        return self.model(x).flatten()
+        with torch.no_grad():
+            y = self.model(x)
+
+        return y.flatten() if single_sample else y.reshape(x.shape[0], -1)
 
     def to(self, device) -> Self:
         self.device = device

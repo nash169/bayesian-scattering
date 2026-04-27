@@ -10,12 +10,24 @@ class Ensemble(nn.Module):
     def __init__(self, model, dim, **kwargs):
         super().__init__()
         self.is_class = kwargs.pop("is_class", False)
+        self.is_probabilistic_regression = kwargs.pop(
+            "is_probabilistic_regression", False
+        )
         self.ensemble = nn.ModuleList([model(**kwargs) for _ in range(dim)])
 
     def _stack_predictions(self, x):
         return torch.stack([model(x) for model in self.ensemble])
 
+    def _stack_regression_moments(self, x):
+        posteriors = [model(x) for model in self.ensemble]
+        means = torch.stack([posterior.mean for posterior in posteriors])
+        variances = torch.stack([posterior.variance for posterior in posteriors])
+        return means, variances
+
     def forward(self, x):
+        if self.is_probabilistic_regression:
+            means, _ = self._stack_regression_moments(x)
+            return means.mean(0)
         preds = self._stack_predictions(x)
         if self.is_class:
             return preds.softmax(dim=-1).mean(0)
@@ -27,6 +39,16 @@ class Ensemble(nn.Module):
         # return torch.mean(pred, axis=0)
 
     def posterior(self, x):
+        if self.is_probabilistic_regression:
+            means, variances = self._stack_regression_moments(x)
+            ensemble_mean = means.mean(0)
+            ensemble_variance = (variances + means.pow(2)).mean(0) - ensemble_mean.pow(
+                2
+            )
+            ensemble_variance = ensemble_variance.clamp_min(1e-6)
+            return gpytorch.distributions.MultivariateNormal(
+                ensemble_mean, torch.diag_embed(ensemble_variance)
+            )
         pred = self._stack_predictions(x).squeeze()
         if self.is_class:
             return pred.softmax(dim=-1).mean(0)

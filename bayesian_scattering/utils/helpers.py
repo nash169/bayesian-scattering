@@ -35,7 +35,9 @@ def get_dataset(dataset_name, store_path, device=torch.device("cpu"), **kwargs):
         fullset = QM9(store_path=store_path, **kwargs).to(device)
         if kwargs["split"]:
             atoms = dict(H=1, C=6, O=8, N=7, S=16, F=9)
-            atom_mask = torch.any(fullset.full_charges == atoms[kwargs["shift"]], axis=1)
+            atom_mask = torch.any(
+                fullset.full_charges == atoms[kwargs["shift"]], axis=1
+            )
             trainset = Subset(fullset, torch.nonzero(~atom_mask))
             testset = Subset(fullset, torch.nonzero(~atom_mask))
         else:
@@ -251,7 +253,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             "covar_module.outputscale": 1.0,
         }
         model.initialize(**hypers)
-    elif model_name.startswith("ensemble_head_reg"):
+    elif model_name.startswith(("ensemble_head_reg", "headens_reg")):
         assert data is not None, "Missing data info"
         data_dim = data[0][0].shape[0]
         layers_func = dict(
@@ -261,15 +263,16 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             layer_norm=nn.LayerNorm(normalized_shape=data_dim),
         )
         model = Ensemble(
-            model=MLP,
+            model=GaussianMLP,
             dim=kwargs["num_models"] if "num_models" in kwargs else 10,
-            layers=[data_dim] + (kwargs["layers"] if "layers" in kwargs else []) + [1],
+            is_probabilistic_regression=True,
+            layers=[data_dim] + (kwargs["layers"] if "layers" in kwargs else []) + [2],
             activation=layers_func[kwargs["activation"]]
             if "activation" in kwargs
             else None,
             features=layers_func[kwargs["features"]] if "features" in kwargs else None,
         ).to(device)
-    elif model_name.startswith("ensemble_full_reg"):
+    elif model_name.startswith(("ensemble_full_reg", "fullens_reg")):
         assert data is not None, "Missing data info"
         num_ch = data[0][0].shape[0]
         layers_func = dict(
@@ -278,11 +281,12 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             gelu=nn.GELU(),
         )
         model = Ensemble(
-            model=TIMMRegression,
+            model=TIMMGaussianRegression,
             num_ch=num_ch,
             features_model=kwargs["features_model"],
             dim=kwargs["num_models"] if "num_models" in kwargs else 10,
-            layers=(kwargs["layers"] if "layers" in kwargs else []) + [1],
+            is_probabilistic_regression=True,
+            layers=(kwargs["layers"] if "layers" in kwargs else []) + [2],
             activation=layers_func[kwargs["activation"]]
             if "activation" in kwargs
             else None,
@@ -549,11 +553,15 @@ def train_model(model, data, cfg, device):
                     optimizer, **cfg["scheduler"]
                 )
                 mlp.to(device)
+                if model.is_class:
+                    loss_fn = torch.nn.CrossEntropyLoss()
+                elif model.is_probabilistic_regression:
+                    loss_fn = None
+                else:
+                    loss_fn = torch.nn.MSELoss()
                 loss[count] = train_mlp(
                     model=mlp,
-                    loss_fn=torch.nn.CrossEntropyLoss()
-                    if model.is_class
-                    else torch.nn.MSELoss(),
+                    loss_fn=loss_fn,
                     data_loader=train_loader,
                     optimizer=optimizer,
                     scheduler=scheduler,

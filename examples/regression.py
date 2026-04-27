@@ -46,7 +46,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # %%
 dataset_id = "histology_nuclei"
 feature_id = "timm_convnext_atto"
-model_id = "gp_reg_rbf"
+model_id = "headens_reg_nonlinear"
 
 # %% [markdown]
 # ## Configs

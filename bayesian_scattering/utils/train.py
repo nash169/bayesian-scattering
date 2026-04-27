@@ -14,6 +14,9 @@ from torch.optim.lr_scheduler import LRScheduler
 def _compute_mlp_loss(
     loss_fn: Callable, y_pred: torch.Tensor, y_true: torch.Tensor
 ) -> torch.Tensor:
+    if isinstance(y_pred, gpytorch.distributions.MultivariateNormal):
+        target = y_true.reshape(y_pred.mean.shape)
+        return -y_pred.log_prob(target) / target.numel()
     if isinstance(loss_fn, torch.nn.CrossEntropyLoss):
         return loss_fn(y_pred, y_true.long().reshape(-1))
     return loss_fn(y_pred, y_true.reshape(y_pred.shape))

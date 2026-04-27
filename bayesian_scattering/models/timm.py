@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import timm
 
 from typing import List
-from bayesian_scattering.models.mlp import MLP
+from bayesian_scattering.models.mlp import GaussianMLP, MLP
 
 
 class _TIMMBase(nn.Module):
@@ -55,6 +55,37 @@ class TIMMRegression(_TIMMBase):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self._preprocess(x)
         return self.model(self.features(x))
+
+
+class TIMMGaussianRegression(_TIMMBase):
+    def __init__(
+        self,
+        num_ch: int,
+        layers: List,
+        features_model="convnext_base.fb_in1k",
+        **kwargs,
+    ):
+        super().__init__()
+
+        self.features = timm.create_model(
+            features_model,
+            pretrained=False,
+            in_chans=num_ch,
+            num_classes=0,
+        )
+        self._init_preprocessing(self.features)
+        self.transforms = timm.data.create_transform(
+            **timm.data.resolve_model_data_config(self.features), is_training=False
+        )
+
+        self.model = GaussianMLP(layers=[self.features.num_features] + layers, **kwargs)
+
+    def posterior(self, x: torch.Tensor):
+        x = self._preprocess(x)
+        return self.model.posterior(self.features(x))
+
+    def forward(self, x: torch.Tensor):
+        return self.posterior(x)
 
 
 class TIMMClassification(_TIMMBase):
