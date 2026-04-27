@@ -1,3 +1,11 @@
+test_poverty:
+  seeds: [12, 7589]
+  max_train: 500
+  max_test: 250
+  dataset: "poverty"
+  features: ["scattering_inv_J7_L8", "timm_convnext_atto"]
+  models: ["base_reg", "gp_reg_rbf", "gp_reg_matern52"]
+
 dist_shift_cut_poverty:
   seeds: [12, 7589, 5437, 321, 665]
   max_train: 1000

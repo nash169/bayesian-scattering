@@ -35,22 +35,18 @@ from bayesian_scattering.utils.helpers import get_results
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # %%
-benchmark_id = "dist_shift_cut_skin_lesion"
+benchmark_id = "test_poverty"
 
 # %% [markdown]
 # ## Settings
 
 # %%
-with open(files("benchmarks").joinpath("benchmarks.yaml")) as f:
+with open(files("configs").joinpath("benchmarks.yaml")) as f:
     benchmarks_cfg = yaml.load(f, Loader=yaml.FullLoader)[benchmark_id]
+    
 dataset = benchmarks_cfg["dataset"]
 features = benchmarks_cfg["features"]
 models = benchmarks_cfg["models"]
-
-with open(files("benchmarks").joinpath("config.yaml")) as f:
-    cfg = yaml.load(f, Loader=yaml.FullLoader)
-cfg['datasets'][dataset]['max_train'] = benchmarks_cfg["max_train"]
-cfg['datasets'][dataset]['max_test'] = benchmarks_cfg["max_test"]
 
 # %% [markdown]
 # ## Run benchmark
@@ -61,9 +57,8 @@ benchmark_log = benchmark_regression(
     dataset_id=dataset,
     models=models,
     features=features,
-    cfg=cfg,
+    cfg=benchmarks_cfg,
     device=device,
-    seeds=benchmarks_cfg["seeds"],
 )
 print(f"Benchmark Time: {time.time() - t0}s")
 

@@ -42,19 +42,13 @@ class TorchImageModel(AbstractFeatures):
             )
 
     def features_from_sample(self, x: torch.Tensor) -> torch.Tensor:
-        x = (
-            self.transforms(x).to(self.device)
-            if self.transforms is not None
-            else x.to(self.device)
-        )
-        single_sample = x.ndim == 3
-        if single_sample:
-            x = x.unsqueeze(0)
+        num_samples = 1 if x.ndim == 3 else x.shape[0] 
+        x = self.transforms(x).to(self.device) if self.transforms is not None else x.to(self.device)
 
         with torch.no_grad():
-            y = self.model(x)
+            y = self.model(x.unsqueeze(0) if x.ndim == 3 else x)
 
-        return y.flatten() if single_sample else y.reshape(x.shape[0], -1)
+        return y.reshape(num_samples, -1).squeeze()
 
     def to(self, device) -> Self:
         self.device = device

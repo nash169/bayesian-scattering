@@ -76,45 +76,8 @@ def get_feature(
 
         transforms = None
 
-        if isinstance(dataset, Pixels):
-            transforms = T.Compose(
-                [
-                    T.Resize(
-                        size=224,
-                        interpolation=T.InterpolationMode.BICUBIC,
-                        max_size=None,
-                        antialias=True,
-                    ),
-                ]
-            )
-            if dataset.dataset_name == "skin_lesion":
-                transforms.transforms.append(
-                    T.Normalize(
-                        mean=torch.tensor([0.5602, 0.5328, 0.7694]),
-                        std=torch.tensor([0.1736, 0.1547, 0.1469]),
-                    ),
-                )
-            if dataset.dataset_name == "histology_nuclei":
-                transforms.transforms.append(
-                    T.Normalize(
-                        mean=torch.tensor([0.7317, 0.5654, 0.7403]),
-                        std=torch.tensor([0.1864, 0.2278, 0.1995]),
-                    ),
-                )
-
-        if isinstance(dataset, WILDS):
-            if dataset.dataset.dataset_name == "poverty":
-                transforms = T.Compose(
-                    [
-                        T.Normalize(
-                            mean=torch.tensor([-0.0785, -0.0771, -0.0568, -0.0067, -0.0054, -0.0877, -0.0280, 0.1652]),
-                            std=torch.tensor([0.9741, 0.9600, 0.9612, 0.9829, 0.9944, 0.9725, 0.9967, 1.1939]),
-                        ),
-                    ]
-                )
-
         feature = WaveletScattering(
-            store_path=store_path, dataset=dataset, **kwargs
+            store_path=store_path, dataset=dataset, transforms=transforms, **kwargs
         ).to(device)
     elif feature_name.startswith("timm"):
         if isinstance(dataset, QM2) or isinstance(dataset, QM9):
@@ -153,12 +116,24 @@ def get_feature(
                 transforms = T.Compose(
                     [
                         Grayscale(),
-                        T.Normalize(
-                            mean=torch.tensor([-0.0785, -0.0771, -0.0568, -0.0067, -0.0054, -0.0877, -0.0280, 0.1652]),
-                            std=torch.tensor([0.9741, 0.9600, 0.9612, 0.9829, 0.9944, 0.9725, 0.9967, 1.1939]),
+                        T.Resize(
+                            size=256,
+                            interpolation=T.InterpolationMode.BICUBIC,
+                            max_size=None,
+                            antialias=True,
                         ),
+                        T.CenterCrop(224),
+                        T.Normalize(
+                            mean=torch.tensor([0.4850, 0.4560, 0.4060]),
+                            std=torch.tensor([0.2290, 0.2240, 0.2250]),
+                        ),
+#                        T.Normalize(
+#                            mean=torch.tensor([-0.0785, -0.0771, -0.0568, -0.0067, -0.0054, -0.0877, -0.0280, 0.1652]),
+#                            std=torch.tensor([0.9741, 0.9600, 0.9612, 0.9829, 0.9944, 0.9725, 0.9967, 1.1939]),
+#                        ),
                     ]
                 )
+                #transforms = None
 
         feature = TorchImageModel(
             store_path=store_path, dataset=dataset, transforms=transforms, **kwargs
@@ -183,7 +158,7 @@ def get_feature(
 
 
 def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
-    if model_name.startswith("gp_exact_reg"):
+    if model_name.startswith("gp_reg"):
         assert data is not None, "Missing training data."
         assert "kernel" in kwargs, "Missing kernel config."
 
@@ -226,7 +201,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             "covar_module.outputscale": 1.0,
         }
         model.initialize(**hypers)
-    elif model_name.startswith("gp_approx_reg"):
+    elif model_name.startswith("svgp_reg"):
         assert data is not None
         inducing_points, _ = next(
             iter(DataLoader(data, batch_size=kwargs.get("num_ip"), shuffle=True))
@@ -253,7 +228,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             "covar_module.outputscale": 1.0,
         }
         model.initialize(**hypers)
-    elif model_name.startswith(("ensemble_head_reg", "headens_reg")):
+    elif model_name.startswith("headens_reg"):
         assert data is not None, "Missing data info"
         data_dim = data[0][0].shape[0]
         layers_func = dict(
@@ -272,7 +247,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             else None,
             features=layers_func[kwargs["features"]] if "features" in kwargs else None,
         ).to(device)
-    elif model_name.startswith(("ensemble_full_reg", "fullens_reg")):
+    elif model_name.startswith("fullens_reg"):
         assert data is not None, "Missing data info"
         num_ch = data[0][0].shape[0]
         layers_func = dict(
@@ -292,7 +267,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             else None,
             features=layers_func[kwargs["features"]] if "features" in kwargs else None,
         )  # .to(device)
-    elif model_name.startswith("laplace_reg") or model_name.startswith("la_reg"):
+    elif model_name.startswith("la_reg"):
         assert data is not None, "Missing training data."
         layers = kwargs.get("layers")
         if layers is None:
@@ -319,7 +294,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             prior_precision=kwargs.get("prior_precision"),
             pred_type=kwargs.get("pred_type", "glm"),
         )
-    elif model_name.startswith("baseline_reg"):
+    elif model_name.startswith("base_reg"):
         assert data is not None, "Missing training data."
         train_y = next(iter(DataLoader(data, batch_size=len(data))))[1]
         train_y = train_y.to(device)
@@ -404,7 +379,7 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             dim=kwargs["num_models"] if "num_models" in kwargs else 10,
             is_class=True,
         )
-    elif model_name.startswith("la_class") or model_name.startswith("laplace_class"):
+    elif model_name.startswith("la_class"):
         assert data is not None, "Missing training data."
         layers = kwargs.get("layers")
         if layers is None:

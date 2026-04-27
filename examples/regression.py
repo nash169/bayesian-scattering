@@ -44,9 +44,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # ## Settings
 
 # %%
-dataset_id = "histology_nuclei"
-feature_id = "timm_convnext_atto"
-model_id = "headens_reg_nonlinear"
+dataset_id = "poverty"
+feature_id = "scattering_inv_J7_L8"
+model_id = "gp_reg_rbf"
 
 # %% [markdown]
 # ## Configs

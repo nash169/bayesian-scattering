@@ -84,7 +84,7 @@ models = [
 ]
 
 with open(files("benchmarks").joinpath("config.yaml")) as f:
-    cfg = yaml.load(f, Loader=yaml.FullLoader)
+    cfg = yaml.load(f, Loader=yaml.FullLoader)["bayesian_opt"]
 
 # %% [markdown]
 # ## Run benchmark
