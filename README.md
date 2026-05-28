@@ -4,7 +4,7 @@ A Bayesian scattering baseline for uncertainty quantification.
 <table>
   <tr>
     <td valign="top" align="center">
-      <strong>Histology Nuclei Pixels</strong>
+      <strong>[Histology Nuclei Pixels](https://drive.google.com/file/d/10gccXwW9bv1yhQdDfABv0fvuYo31foNb/view?usp=drive_link)</strong>
       <table>
         <tr>
           <td><img src="media/histology_train_1.png" alt="Histology training sample 1" width="110"></td>
