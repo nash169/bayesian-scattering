@@ -4,7 +4,7 @@ A Bayesian scattering baseline for uncertainty quantification.
 <table>
   <tr>
     <td valign="top" align="center">
-      <strong>[Histology Nuclei Pixels](https://drive.google.com/file/d/10gccXwW9bv1yhQdDfABv0fvuYo31foNb/view?usp=drive_link)</strong>
+      <strong>Histology Nuclei Pixels</strong>
       <table>
         <tr>
           <td><img src="media/histology_train_1.png" alt="Histology training sample 1" width="110"></td>
@@ -96,7 +96,7 @@ DATA_PATH/
     └── poverty_v1.1/
 ```
 
-- `skin_lesion` should be located at `os.environ["DATA_PATH"]/pixels/skin_lesion`.
-- `histology_nuclei` should be located at `os.environ["DATA_PATH"]/pixels/histology_nuclei`.
-- The asset wealth dataset (`poverty`) should be located at `os.environ["DATA_PATH"]/wilds/poverty_v1.1`.
+- [`skin_lesion`](https://drive.google.com/file/d/1H84sqvEfsUBJUxhLXjXa_BS4A-qK4SU3/view?usp=drive_link) should be located at `os.environ["DATA_PATH"]/pixels/skin_lesion`.
+- [`histology_nuclei`](https://drive.google.com/file/d/10gccXwW9bv1yhQdDfABv0fvuYo31foNb/view?usp=drive_link) should be located at `os.environ["DATA_PATH"]/pixels/histology_nuclei`.
+- The asset wealth dataset ([`poverty`](https://drive.google.com/file/d/1x8m7yu8JlWVkTbPy3acsQVmbzVs7H0uV/view?usp=drive_link)) should be located at `os.environ["DATA_PATH"]/wilds/poverty_v1.1`.
 - `qm2` (QM2D) and `qm9` are generated or downloaded automatically when needed, so you do not need to prepare their folders manually.
