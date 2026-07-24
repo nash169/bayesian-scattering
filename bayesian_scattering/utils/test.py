@@ -1,3 +1,5 @@
+import math
+
 import torch
 import gpytorch
 
@@ -9,13 +11,70 @@ from bayesian_scattering.utils.metrics import (
     prediction_interval_length,
     quantile_coverage_error_signed,
 )
-from bayesian_scattering.models import Baseline, Ensemble, LaplaceApproximation
+from bayesian_scattering.models import (
+    Baseline,
+    ConformalMLP,
+    CQRMLP,
+    Ensemble,
+    LaplaceApproximation,
+)
+
+
+def _conformal_score_quantile(scores, coverage):
+    n = scores.numel()
+    return scores.quantile(min(math.ceil((n + 1) * coverage / 100.0) / n, 1.0)).item()
+
+
+def conformal_quantiles(
+    model,
+    loader,
+    device,
+    labels_norm=None,
+    quantiles=(90.0, 95.0, 99.0),
+):
+    scores = []
+    with torch.no_grad():
+        for x_batch, y_batch in loader:
+            y_batch = y_batch.squeeze()
+            x_batch, y_batch = x_batch.to(device), y_batch.to(device)
+            if labels_norm is not None:
+                mu_y, std_y = labels_norm
+                y_batch.sub_(mu_y).div_(std_y)
+            posterior = model.posterior(x_batch)
+            scores.append((y_batch - posterior.mean).abs() / posterior.stddev)
+    scores = torch.cat(scores)
+    return {q: _conformal_score_quantile(scores, q) for q in quantiles}
+
+
+def cqr_quantiles(
+    model,
+    loader,
+    device,
+    labels_norm=None,
+    quantiles=(90.0, 95.0, 99.0),
+):
+    scores = {q: [] for q in quantiles}
+    with torch.no_grad():
+        for x_batch, y_batch in loader:
+            y_batch = y_batch.squeeze()
+            x_batch, y_batch = x_batch.to(device), y_batch.to(device)
+            if labels_norm is not None:
+                mu_y, std_y = labels_norm
+                y_batch.sub_(mu_y).div_(std_y)
+            prediction = model(x_batch)
+            for q in quantiles:
+                lo, hi = model.bounds(prediction, q)
+                scores[q].append(torch.maximum(lo - y_batch, y_batch - hi))
+    return {
+        q: _conformal_score_quantile(torch.cat(s), q) for q, s in scores.items()
+    }
 
 
 def test_regression(
     model,
     loader,
     labels_norm=None,
+    calibration_loader=None,
 ):
     eval_log = {
         "rmse": 0.0,
@@ -36,10 +95,25 @@ def test_regression(
     elif isinstance(model, LaplaceApproximation):
         device = next(model.model.parameters()).device
         model.eval()
+    elif isinstance(model, (ConformalMLP, CQRMLP)):
+        device = next(model.parameters()).device
+        model.eval()
     else:
         device = next(model.parameters()).device
         model.likelihood.eval()
         model.eval()
+
+    conformal_q = None
+    if calibration_loader is not None and isinstance(
+        model, (Ensemble, ConformalMLP, CQRMLP)
+    ):
+        calibrate = cqr_quantiles if isinstance(model, CQRMLP) else conformal_quantiles
+        conformal_q = calibrate(
+            model, calibration_loader, device, labels_norm=labels_norm
+        )
+        for q in conformal_q:
+            eval_log[f"cp_qce_{int(q)}"] = 0.0
+            eval_log[f"cp_pi_{int(q)}"] = [0.0, 0.0]
 
     with torch.no_grad():
         for x_batch, y_batch in loader:
@@ -48,7 +122,9 @@ def test_regression(
             if labels_norm is not None:
                 mu_y, std_y = labels_norm
                 y_batch.sub_(mu_y).div_(std_y)
-            if isinstance(model, (Baseline, Ensemble, LaplaceApproximation)):
+            if isinstance(
+                model, (Baseline, ConformalMLP, CQRMLP, Ensemble, LaplaceApproximation)
+            ):
                 posterior = model.posterior(x_batch)
             else:
                 posterior = model.likelihood(model(x_batch))
@@ -95,8 +171,35 @@ def test_regression(
             )
             eval_log["pi_99"][0] += pi_mu.item() * y_batch.numel()
             eval_log["pi_99"][1] += pi_std.item() * y_batch.numel()
+            if conformal_q is not None:
+                if isinstance(model, CQRMLP):
+                    prediction = model(x_batch)
+                    for q, q_hat in conformal_q.items():
+                        lo, hi = model.bounds(prediction, q)
+                        lo, hi = lo - q_hat, hi + q_hat
+                        coverage = (
+                            ((y_batch >= lo) & (y_batch <= hi)).float().mean().item()
+                        )
+                        eval_log[f"cp_qce_{int(q)}"] += (
+                            coverage - q / 100
+                        ) * y_batch.numel()
+                        length = hi - lo
+                        eval_log[f"cp_pi_{int(q)}"][0] += length.mean().item() * y_batch.numel()
+                        eval_log[f"cp_pi_{int(q)}"][1] += length.std().item() * y_batch.numel()
+                else:
+                    abs_err = (y_batch - posterior.mean).abs()
+                    for q, q_hat in conformal_q.items():
+                        coverage = (
+                            (abs_err <= q_hat * posterior.stddev).float().mean().item()
+                        )
+                        eval_log[f"cp_qce_{int(q)}"] += (
+                            coverage - q / 100
+                        ) * y_batch.numel()
+                        length = 2.0 * q_hat * posterior.stddev
+                        eval_log[f"cp_pi_{int(q)}"][0] += length.mean().item() * y_batch.numel()
+                        eval_log[f"cp_pi_{int(q)}"][1] += length.std().item() * y_batch.numel()
         for key, val in eval_log.items():
-            if key.startswith("pi_"):
+            if isinstance(val, list):
                 eval_log[key][0] /= len(loader.dataset)
                 eval_log[key][1] /= len(loader.dataset)
             else:

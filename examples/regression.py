@@ -33,6 +33,7 @@ import yaml
 from torch.utils.data import DataLoader
 
 sys.path.insert(0, os.path.abspath(os.path.join("../")))
+from bayesian_scattering.datasets import Pixels, WILDS
 from bayesian_scattering.utils import test_regression, train_approx_gp, train_exact_gp
 from bayesian_scattering.utils.benchmark import get_dataset, get_feature, get_model, train_model
 
@@ -44,8 +45,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # ## Settings
 
 # %%
-dataset_id = "poverty"
-feature_id = "scattering_inv_J7_L8"
+dataset_id = "skin_lesion"
+feature_id = "scattering_inv_J5_L8"
 model_id = "gp_reg_rbf"
 
 # %% [markdown]
@@ -78,8 +79,10 @@ data_path.mkdir(parents=True, exist_ok=True)
 
 features_path = Path(os.environ["FEATURES_PATH"]).joinpath(dataset_id)
 features_path_train, features_path_test = features_path.joinpath("train"), features_path.joinpath("test")
+features_path_val = features_path.joinpath("val")
 features_path_train.mkdir(parents=True, exist_ok=True)
 features_path_test.mkdir(parents=True, exist_ok=True)
+features_path_val.mkdir(parents=True, exist_ok=True)
 
 # %% [markdown]
 # ## Dataset
@@ -96,6 +99,13 @@ test_idx = torch.randperm(len(testset))[:dataset_opts["max_test"]] if dataset_op
 
 if dataset_opts["normalized_labels"]:
     trainset.normalized_labels(idx=train_idx)
+
+# validation split, used to calibrate conformal prediction for ensembles
+if dataset_id in ["iwildcam", "poverty"]:
+    valset = WILDS(dataset_name=dataset_id, split="val", dataset_path=data_path, **dataset_opts).to(device)
+else:
+    valset = Pixels(dataset_name=dataset_id, split="val", dataset_path=data_path, **dataset_opts).to(device)
+val_idx = torch.randperm(len(valset))[:dataset_opts["max_test"]] if dataset_opts["max_test"] is not None else None
 
 # %% [raw]
 # x, y = next(iter(DataLoader(trainset, len(trainset))))
@@ -124,6 +134,15 @@ f_test = get_feature(
     store_path=features_path_test,
     dataset=testset,
     indices=test_idx,
+    device=device,
+    **feature_opts,
+)
+
+f_val = get_feature(
+    feature_name=feature_id,
+    store_path=features_path_val,
+    dataset=valset,
+    indices=val_idx,
     device=device,
     **feature_opts,
 )
@@ -158,10 +177,15 @@ test_loader = DataLoader(
     f_test,
     **cfg["dataloader"]
 )
+val_loader = DataLoader(
+    f_val,
+    **cfg["dataloader"]
+)
 results_log = test_regression(
     model,
     test_loader,
-    labels_norm=trainset.labels_norm if dataset_opts["normalized_labels"] else None
+    labels_norm=trainset.labels_norm if dataset_opts["normalized_labels"] else None,
+    calibration_loader=val_loader,
 )
 
 # %%

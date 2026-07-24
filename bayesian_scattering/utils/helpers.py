@@ -1,3 +1,4 @@
+import timm
 import torch
 import torchvision.transforms as T
 import torch.nn as nn
@@ -7,9 +8,9 @@ import pickle
 from torch.utils.data import Subset, DataLoader, default_collate
 import wilds
 from bayesian_scattering.datasets import *
-from bayesian_scattering.features import Identity, TorchImageModel, WaveletScattering
+from bayesian_scattering.features import Identity, PCA, TorchImageModel, WaveletScattering
 from bayesian_scattering.models import *
-from bayesian_scattering.utils.train import train_exact_gp, train_approx_gp, train_mlp
+from bayesian_scattering.utils.train import PinballLoss, train_exact_gp, train_approx_gp, train_mlp
 from bayesian_scattering.utils.math import average_distance
 from bayesian_scattering.utils.transforms import Grayscale
 
@@ -86,10 +87,13 @@ def get_feature(
         transforms = None
 
         if isinstance(dataset, Pixels):
+            # resize to the pretrained model's native input size (e.g. 224 for
+            # convnext, 518 for dinov2)
+            input_size = timm.get_pretrained_cfg(kwargs["pretrained_model"]).input_size[-1]
             transforms = T.Compose(
                 [
                     T.Resize(
-                        size=224,
+                        size=input_size,
                         interpolation=T.InterpolationMode.BICUBIC,
                         max_size=None,
                         antialias=True,
@@ -146,6 +150,8 @@ def get_feature(
 
         dataset.unimol = True
         feature = feature_cls(store_path=store_path, dataset=dataset, **kwargs)
+    elif feature_name.startswith("pca"):
+        feature = PCA(store_path=store_path, dataset=dataset, **kwargs).to(device)
     elif feature_name.startswith("identity"):
         feature = Identity(dataset=dataset, **kwargs).to(device)
     else:
@@ -267,6 +273,38 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             else None,
             features=layers_func[kwargs["features"]] if "features" in kwargs else None,
         )  # .to(device)
+    elif model_name.startswith("cpmlp_reg"):
+        assert data is not None, "Missing data info"
+        data_dim = data[0][0].shape[0]
+        layers_func = dict(
+            tanh=nn.Tanh(),
+            relu=nn.ReLU(),
+            gelu=nn.GELU(),
+            layer_norm=nn.LayerNorm(normalized_shape=data_dim),
+        )
+        model = ConformalMLP(
+            layers=[data_dim] + (kwargs["layers"] if "layers" in kwargs else []) + [1],
+            activation=layers_func[kwargs["activation"]]
+            if "activation" in kwargs
+            else None,
+            features=layers_func[kwargs["features"]] if "features" in kwargs else None,
+        ).to(device)
+    elif model_name.startswith("cqr_reg"):
+        assert data is not None, "Missing data info"
+        data_dim = data[0][0].shape[0]
+        layers_func = dict(
+            tanh=nn.Tanh(),
+            relu=nn.ReLU(),
+            gelu=nn.GELU(),
+            layer_norm=nn.LayerNorm(normalized_shape=data_dim),
+        )
+        model = CQRMLP(
+            layers=[data_dim] + (kwargs["layers"] if "layers" in kwargs else []),
+            activation=layers_func[kwargs["activation"]]
+            if "activation" in kwargs
+            else None,
+            features=layers_func[kwargs["features"]] if "features" in kwargs else None,
+        ).to(device)
     elif model_name.startswith("la_reg"):
         assert data is not None, "Missing training data."
         layers = kwargs.get("layers")
@@ -514,6 +552,27 @@ def train_model(model, data, cfg, device):
                 fit_loader,
                 progress_bar=cfg["train"].get("verbose", False),
             )
+        elif isinstance(model, (ConformalMLP, CQRMLP)):
+            optimizer = torch.optim.Adam(
+                model.parameters(),
+                lr=1.0e-4,
+                weight_decay=0.0,
+            )
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer, **cfg["scheduler"]
+            )
+            loss = train_mlp(
+                model=model,
+                loss_fn=PinballLoss(model.quantiles)
+                if isinstance(model, CQRMLP)
+                else torch.nn.MSELoss(),
+                data_loader=train_loader,
+                optimizer=optimizer,
+                scheduler=scheduler,
+                **cfg["train"],
+            )
+            if isinstance(model, ConformalMLP):
+                model.fit_noise_var(train_loader)
         elif isinstance(model, Ensemble):
             loss = torch.zeros(len(model.ensemble))
             for count, mlp in enumerate(model.ensemble):

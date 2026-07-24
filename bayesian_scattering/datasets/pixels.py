@@ -26,6 +26,11 @@ class Pixels(AbstractDataset):
                 self.samples = torch.from_numpy(pickle.load(f_x)).float().permute(0, 3, 1, 2).contiguous() / 255.
             with open(dataset_path.joinpath(f'{dataset_name}/labels_test.pkl'), 'rb') as f_y:
                 self.labels = torch.from_numpy(pickle.load(f_y)).float().contiguous()
+        elif split == "val":
+            with open(dataset_path.joinpath(f'{dataset_name}/images_val.pkl'), 'rb') as f_x:
+                self.samples = torch.from_numpy(pickle.load(f_x)).float().permute(0, 3, 1, 2).contiguous() / 255.
+            with open(dataset_path.joinpath(f'{dataset_name}/labels_val.pkl'), 'rb') as f_y:
+                self.labels = torch.from_numpy(pickle.load(f_y)).float().contiguous()
 
         self.dataset_name = dataset_name
         self.device = torch.device("cpu")

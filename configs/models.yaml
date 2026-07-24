@@ -115,6 +115,16 @@ fullens_reg_dinov2_base:
   layers: [128]
   activation: tanh
 
+# Regression Conformal MLP (deterministic, constant-width conformal intervals)
+cpmlp_reg_nonlinear:
+  layers: [128]
+  activation: tanh
+
+# Regression Conformalized Quantile Regression (CQR)
+cqr_reg_nonlinear:
+  layers: [128]
+  activation: tanh
+
 # Regression Laplace Approximation
 la_reg_nonlinear:
   layers: [128]

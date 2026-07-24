@@ -11,6 +11,17 @@ from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 
 
+class PinballLoss(torch.nn.Module):
+    def __init__(self, quantiles):
+        super().__init__()
+        self.register_buffer("quantiles", torch.as_tensor(quantiles))
+
+    def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
+        diff = y_true.reshape(-1, 1) - y_pred
+        quantiles = self.quantiles.to(diff)
+        return torch.maximum(quantiles * diff, (quantiles - 1.0) * diff).mean()
+
+
 def _compute_mlp_loss(
     loss_fn: Callable, y_pred: torch.Tensor, y_true: torch.Tensor
 ) -> torch.Tensor:
@@ -19,6 +30,8 @@ def _compute_mlp_loss(
         return -y_pred.log_prob(target) / target.numel()
     if isinstance(loss_fn, torch.nn.CrossEntropyLoss):
         return loss_fn(y_pred, y_true.long().reshape(-1))
+    if isinstance(loss_fn, PinballLoss):
+        return loss_fn(y_pred, y_true)
     return loss_fn(y_pred, y_true.reshape(y_pred.shape))
 
 

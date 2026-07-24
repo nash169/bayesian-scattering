@@ -112,3 +112,9 @@ unimol_qm2:
 
 identity:
   dummy: "something"
+
+identity_flat:
+  flatten: true
+
+pca_256:
+  n_components: 256

@@ -11,6 +11,7 @@ from botorch.acquisition import LogExpectedImprovement
 from copy import deepcopy
 from importlib.resources import files
 
+from bayesian_scattering.datasets import Pixels, WILDS
 from bayesian_scattering.utils.test import test_regression
 from bayesian_scattering.utils.helpers import get_dataset, get_feature, get_model, get_kernel, train_model, get_results, get_regrets
 
@@ -41,8 +42,10 @@ def benchmark_regression(dataset_id, models, features, cfg, device):
     features_path = Path(os.environ["FEATURES_PATH"]).joinpath(dataset_id)
     features_path_train = features_path.joinpath("train")
     features_path_test = features_path.joinpath("test")
+    features_path_val = features_path.joinpath("val")
     features_path_train.mkdir(parents=True, exist_ok=True)
     features_path_test.mkdir(parents=True, exist_ok=True)
+    features_path_val.mkdir(parents=True, exist_ok=True)
 
     # dataset
     trainset, testset = get_dataset(
@@ -52,6 +55,12 @@ def benchmark_regression(dataset_id, models, features, cfg, device):
         **datasets_opts[dataset_id],
     )
 
+    # validation split, used to calibrate conformal prediction for ensembles
+    if dataset_id in ["iwildcam", "poverty"]:
+        valset = WILDS(dataset_name=dataset_id, split="val", dataset_path=data_path, **datasets_opts[dataset_id]).to(device)
+    else:
+        valset = Pixels(dataset_name=dataset_id, split="val", dataset_path=data_path, **datasets_opts[dataset_id]).to(device)
+
     benchmark_log = {}
     seeds = cfg["seeds"]
 
@@ -59,6 +68,7 @@ def benchmark_regression(dataset_id, models, features, cfg, device):
         torch.manual_seed(seed)
         train_idx = torch.randperm(len(trainset))[:cfg["max_train"]] if cfg["max_train"] is not None else None
         test_idx = torch.randperm(len(testset))[:cfg["max_test"]] if cfg["max_test"] is not None else None
+        val_idx = torch.randperm(len(valset))[:cfg["max_test"]] if cfg["max_test"] is not None else None
 
         if datasets_opts[dataset_id]["normalized_labels"]:
             trainset.normalized_labels(idx=train_idx)
@@ -83,6 +93,19 @@ def benchmark_regression(dataset_id, models, features, cfg, device):
             )
             test_loader = DataLoader(
                 f_test,
+                **train_opts["dataloader"]
+            )
+
+            f_val = get_feature(
+                feature_name=feature_id,
+                store_path=features_path_val,
+                dataset=valset,
+                indices=val_idx,
+                device=device,
+                **features_opts[feature_id],
+            )
+            val_loader = DataLoader(
+                f_val,
                 **train_opts["dataloader"]
             )
 
@@ -114,6 +137,7 @@ def benchmark_regression(dataset_id, models, features, cfg, device):
                     model,
                     test_loader,
                     labels_norm=trainset.labels_norm if datasets_opts[dataset_id]["normalized_labels"] else None,
+                    calibration_loader=val_loader,
                 )
                 model.cpu()
                 results_dict['loss'] = loss

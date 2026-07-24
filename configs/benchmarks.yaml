@@ -72,6 +72,14 @@ dist_shift_full_ens_skin_lesion:
   features: ["identity"]
   models: ["fullens_reg_convnext_atto"]
 
+dist_shift_cut_skin_lesion_new:
+  seeds: [12, 7589, 5437, 321, 665]
+  max_train: 1000
+  max_test: 250
+  dataset: "skin_lesion"
+  features: ["identity_flat", "pca_256", "scattering_inv_J5_L8", "timm_convnext_atto", "timm_dinov2_small"]
+  models: ["gp_reg_lin", "gp_reg_lin_ard", "gp_reg_rbf", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+
 # -----------------------------------------------------
 
 dist_shift_cut_histology_nuclei:
