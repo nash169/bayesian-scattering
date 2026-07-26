@@ -8,11 +8,13 @@ gp_reg_lin:
   signal_var: 1.0
   kernel:
     id: linear
+    variance: auto
 gp_reg_lin_ard:
   noise_var: 1e-2
   signal_var: 1.0
   kernel:
     id: linear
+    variance: auto
     ard_num_dims: auto
 
 # Regression GP RBF Kernel

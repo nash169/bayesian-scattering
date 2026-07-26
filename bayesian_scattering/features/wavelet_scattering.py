@@ -42,6 +42,9 @@ class WaveletScattering(AbstractFeatures):
                 **kwargs
             )
             prefix = f'scatter_j{kwargs.get("J")}_l{kwargs.get("L")}_{"ri" if rot_invariant else "rc"}'
+            # max_order=2 keeps the historical prefix so existing caches stay valid
+            if kwargs.get("max_order", 2) != 2:
+                prefix += f'_o{kwargs.get("max_order")}'
         elif dimension == 3:
             self.ws = HarmonicScattering3D(rotation_covariant=rot_invariant, **kwargs)
             prefix = f'scatter_j{kwargs.get("J")}_l{kwargs.get("L")}_p{int(kwargs.get("integral_powers")[-1])}_{"ri" if rot_invariant else "rc"}'

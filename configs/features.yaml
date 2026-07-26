@@ -4,6 +4,11 @@ scattering_inv_J3_L8:
   L: 8
   max_order: 2
   rot_invariant: true
+scattering_inv_J3_L8_o1:
+  J: 3
+  L: 8
+  max_order: 1
+  rot_invariant: true
 scattering_cov_J3_L8:
   J: 3
   L: 8
@@ -27,6 +32,11 @@ scattering_inv_J5_L8:
   J: 5
   L: 8
   max_order: 2
+  rot_invariant: true
+scattering_inv_J5_L8_o1:
+  J: 5
+  L: 8
+  max_order: 1
   rot_invariant: true
 scattering_cov_J5_L8:
   J: 5
@@ -118,3 +128,12 @@ identity_flat:
 
 pca_256:
   n_components: 256
+
+randconv_J3_L8:
+  J: 3
+  L: 8
+  max_order: 2
+randconv_J5_L8:
+  J: 5
+  L: 8
+  max_order: 2

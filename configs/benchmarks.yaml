@@ -77,8 +77,11 @@ dist_shift_cut_skin_lesion_new:
   max_train: 1000
   max_test: 250
   dataset: "skin_lesion"
-  features: ["identity_flat", "pca_256", "scattering_inv_J5_L8", "timm_convnext_atto", "timm_dinov2_small"]
-  models: ["gp_reg_lin", "gp_reg_lin_ard", "gp_reg_rbf", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+  # J=3 is the configuration reported for skin_lesion in the paper, and the
+  # controls (order-1 wavelets, random filters) are matched to it; the J=5 set
+  # is kept for the scale comparison
+  features: ["identity_flat", "pca_256", "randconv_J3_L8", "scattering_inv_J3_L8", "scattering_inv_J3_L8_o1", "randconv_J5_L8", "scattering_inv_J5_L8", "scattering_inv_J5_L8_o1", "timm_convnext_atto", "timm_dinov2_small"]
+  models: ["gp_reg_lin", "gp_reg_lin_ard", "gp_reg_rbf", "gp_reg_matern52", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
 
 # -----------------------------------------------------
 

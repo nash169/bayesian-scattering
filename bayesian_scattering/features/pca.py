@@ -13,6 +13,7 @@ class PCA(AbstractFeatures):
         self,
         store_path,
         dataset: Optional[AbstractDataset] = None,
+        indices=None,
         n_components: int = 256,
         **kwargs
     ):
@@ -21,16 +22,13 @@ class PCA(AbstractFeatures):
         )
         self.n_components = n_components
 
-        # basis is fit once on the train (or full) split and shared across splits
+        # the basis is refit from scratch on the training subset it is given;
+        # the file only hands it over to the test/val splits, it is not a cache
         store_path = Path(store_path)
         basis_path = store_path.parent.joinpath(f"pca_{n_components}_basis.pt")
-        if basis_path.exists():
-            basis = torch.load(basis_path)
-            self.mean, self.components = basis["mean"], basis["components"]
-        elif store_path.name in ["train", "full"]:
-            x = torch.stack(
-                [self.base[i][0].flatten().cpu() for i in range(len(self.base))]
-            )
+        if store_path.name in ["train", "full"]:
+            fit_idx = range(len(self.base)) if indices is None else indices
+            x = torch.stack([self.base[i][0].flatten().cpu() for i in fit_idx])
             self.mean = x.mean(dim=0)
             _, _, self.components = torch.pca_lowrank(
                 x - self.mean, q=n_components, center=False
@@ -38,6 +36,9 @@ class PCA(AbstractFeatures):
             torch.save(
                 {"mean": self.mean, "components": self.components}, basis_path
             )
+        elif basis_path.exists():
+            basis = torch.load(basis_path)
+            self.mean, self.components = basis["mean"], basis["components"]
         else:
             raise FileNotFoundError(
                 f"PCA basis not found at {basis_path}. "

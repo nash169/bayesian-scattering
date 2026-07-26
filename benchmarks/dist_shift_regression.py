@@ -35,7 +35,7 @@ from bayesian_scattering.utils.helpers import get_results
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # %%
-benchmark_id = "test_poverty"
+benchmark_id = "dist_shift_cut_skin_lesion_new"
 
 # %% [markdown]
 # ## Settings
@@ -70,5 +70,8 @@ df = get_results(
     benchmark_log,
     store_path=Path(os.environ["RESULTS_PATH"]).joinpath(f"{benchmark_id}")
 )
+
+# %%
+df
 
 # %%

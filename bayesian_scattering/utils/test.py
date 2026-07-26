@@ -20,6 +20,14 @@ from bayesian_scattering.models import (
 )
 
 
+def _predictive(model, x):
+    if isinstance(
+        model, (Baseline, ConformalMLP, CQRMLP, Ensemble, LaplaceApproximation)
+    ):
+        return model.posterior(x)
+    return model.likelihood(model(x))
+
+
 def _conformal_score_quantile(scores, coverage):
     n = scores.numel()
     return scores.quantile(min(math.ceil((n + 1) * coverage / 100.0) / n, 1.0)).item()
@@ -40,7 +48,7 @@ def conformal_quantiles(
             if labels_norm is not None:
                 mu_y, std_y = labels_norm
                 y_batch.sub_(mu_y).div_(std_y)
-            posterior = model.posterior(x_batch)
+            posterior = _predictive(model, x_batch)
             scores.append((y_batch - posterior.mean).abs() / posterior.stddev)
     scores = torch.cat(scores)
     return {q: _conformal_score_quantile(scores, q) for q in quantiles}
@@ -104,9 +112,7 @@ def test_regression(
         model.eval()
 
     conformal_q = None
-    if calibration_loader is not None and isinstance(
-        model, (Ensemble, ConformalMLP, CQRMLP)
-    ):
+    if calibration_loader is not None:
         calibrate = cqr_quantiles if isinstance(model, CQRMLP) else conformal_quantiles
         conformal_q = calibrate(
             model, calibration_loader, device, labels_norm=labels_norm
@@ -122,12 +128,7 @@ def test_regression(
             if labels_norm is not None:
                 mu_y, std_y = labels_norm
                 y_batch.sub_(mu_y).div_(std_y)
-            if isinstance(
-                model, (Baseline, ConformalMLP, CQRMLP, Ensemble, LaplaceApproximation)
-            ):
-                posterior = model.posterior(x_batch)
-            else:
-                posterior = model.likelihood(model(x_batch))
+            posterior = _predictive(model, x_batch)
             eval_log["rmse"] += (
                 gpytorch.metrics.mean_squared_error(
                     posterior, y_batch, squared=False

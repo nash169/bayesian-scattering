@@ -2,8 +2,9 @@ from bayesian_scattering.features.wavelet_scattering import WaveletScattering
 from bayesian_scattering.features.timm import TorchImageModel
 from bayesian_scattering.features.identity import Identity
 from bayesian_scattering.features.pca import PCA
+from bayesian_scattering.features.random_conv import RandomConv
 
-__all__ = ["WaveletScattering", "TorchImageModel", "Unimol", "Identity", "PCA"]
+__all__ = ["WaveletScattering", "TorchImageModel", "Unimol", "Identity", "PCA", "RandomConv"]
 
 
 def __getattr__(name):

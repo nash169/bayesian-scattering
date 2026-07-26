@@ -8,7 +8,7 @@ import pickle
 from torch.utils.data import Subset, DataLoader, default_collate
 import wilds
 from bayesian_scattering.datasets import *
-from bayesian_scattering.features import Identity, PCA, TorchImageModel, WaveletScattering
+from bayesian_scattering.features import Identity, PCA, RandomConv, TorchImageModel, WaveletScattering
 from bayesian_scattering.models import *
 from bayesian_scattering.utils.train import PinballLoss, train_exact_gp, train_approx_gp, train_mlp
 from bayesian_scattering.utils.math import average_distance
@@ -150,8 +150,14 @@ def get_feature(
 
         dataset.unimol = True
         feature = feature_cls(store_path=store_path, dataset=dataset, **kwargs)
+    elif feature_name.startswith("randconv"):
+        feature = RandomConv(
+            store_path=store_path, dataset=dataset, indices=indices, **kwargs
+        ).to(device)
     elif feature_name.startswith("pca"):
-        feature = PCA(store_path=store_path, dataset=dataset, **kwargs).to(device)
+        feature = PCA(
+            store_path=store_path, dataset=dataset, indices=indices, **kwargs
+        ).to(device)
     elif feature_name.startswith("identity"):
         feature = Identity(dataset=dataset, **kwargs).to(device)
     else:
@@ -188,24 +194,30 @@ def get_model(model_name, data=None, device=torch.device("cpu"), **kwargs):
             kargs["ard_num_dims"] = train_x.shape[1]
         if "lengthscale" in kargs and kargs["lengthscale"] == "auto":
             kargs["lengthscale"] = average_distance(train_x)
+        if "variance" in kargs and kargs["variance"] == "auto":
+            # put k(x, x) on the scale of the (standardized) targets
+            kargs["variance"] = 1.0 / train_x.pow(2).sum(dim=1).mean()
+
+        kernel = get_kernel(
+            id=kargs.pop("id"),
+            **kargs,
+            # id=kwargs.get('kernel')['id'],
+            # **{k: v for k, v in kwargs.get('kernel').items() if k != "id"},
+        )
+        # the linear kernel already carries its own (per-dim) variance, so a
+        # ScaleKernel around it would only duplicate that parameter
+        if not isinstance(kernel, gpytorch.kernels.LinearKernel):
+            kernel = gpytorch.kernels.ScaleKernel(kernel)
 
         model = ExactGP(
             train_x,
             train_y.squeeze(),
             gpytorch.likelihoods.GaussianLikelihood(),
-            gpytorch.kernels.ScaleKernel(
-                get_kernel(
-                    id=kargs.pop("id"),
-                    **kargs,
-                    # id=kwargs.get('kernel')['id'],
-                    # **{k: v for k, v in kwargs.get('kernel').items() if k != "id"},
-                )
-            ),
+            kernel,
         ).to(device)
-        hypers = {
-            "likelihood.noise_covar.noise": 1e-2,
-            "covar_module.outputscale": 1.0,
-        }
+        hypers = {"likelihood.noise_covar.noise": 1e-2}
+        if isinstance(kernel, gpytorch.kernels.ScaleKernel):
+            hypers["covar_module.outputscale"] = 1.0
         model.initialize(**hypers)
     elif model_name.startswith("svgp_reg"):
         assert data is not None
@@ -482,6 +494,9 @@ def get_kernel(id, **kwargs):
 
     if "lengthscale" in kwargs:
         kernel.lengthscale = kwargs["lengthscale"]
+
+    if "variance" in kwargs:
+        kernel.variance = kwargs["variance"]
 
     return kernel
 
