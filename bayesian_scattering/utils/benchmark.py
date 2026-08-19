@@ -16,7 +16,7 @@ from bayesian_scattering.utils.test import test_regression
 from bayesian_scattering.utils.helpers import get_dataset, get_feature, get_model, get_kernel, train_model, get_results, get_regrets
 
 
-def benchmark_regression(dataset_id, models, features, cfg, device):
+def benchmark_regression(dataset_id, dist_shift, models, features, cfg, device):
     # configs
     with open(files("configs").joinpath("datasets.yaml")) as f:
         datasets_opts = yaml.load(f, Loader=yaml.FullLoader)
@@ -50,6 +50,7 @@ def benchmark_regression(dataset_id, models, features, cfg, device):
     # dataset
     trainset, testset = get_dataset(
         dataset_name=dataset_id,
+        dist_shift=dist_shift,
         store_path=data_path,
         device=device,
         **datasets_opts[dataset_id],
@@ -110,7 +111,7 @@ def benchmark_regression(dataset_id, models, features, cfg, device):
             )
 
             for model_id in models:
-                print(f"R: {rep+1}/{len(seeds)}, D: {dataset_id}, F: {feature_id}, M: {model_id}, N_TRAIN: {len(f_train)}, N_TEST: {len(f_test)}")
+                print(f"R: {rep + 1}/{len(seeds)}, D: {dataset_id}, F: {feature_id}, M: {model_id}, N_TRAIN: {len(f_train)}, N_TEST: {len(f_test)}")
                 curr_key = f"F_{feature_id}_M_{model_id}"
                 if curr_key not in benchmark_log:
                     benchmark_log[curr_key] = []

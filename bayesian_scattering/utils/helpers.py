@@ -15,7 +15,7 @@ from bayesian_scattering.utils.math import average_distance
 from bayesian_scattering.utils.transforms import Grayscale
 
 
-def get_dataset(dataset_name, store_path, device=torch.device("cpu"), **kwargs):
+def get_dataset(dataset_name, dist_shift, store_path, device=torch.device("cpu"), **kwargs):
     assert dataset_name in [
         "qm2",
         "qm9",
@@ -50,7 +50,7 @@ def get_dataset(dataset_name, store_path, device=torch.device("cpu"), **kwargs):
             dataset_name=dataset_name, split="train", dataset_path=store_path, **kwargs
         ).to(device)
         testset = WILDS(
-            dataset_name=dataset_name, split="test", dataset_path=store_path, **kwargs
+            dataset_name=dataset_name, split="test" if dist_shift else "id_val", dataset_path=store_path, **kwargs
         ).to(device)
         return trainset, testset
     elif dataset_name in ["skin_lesion", "histology_nuclei"]:
@@ -58,7 +58,7 @@ def get_dataset(dataset_name, store_path, device=torch.device("cpu"), **kwargs):
             dataset_name=dataset_name, split="train", dataset_path=store_path, **kwargs
         ).to(device)
         testset = Pixels(
-            dataset_name=dataset_name, split="test", dataset_path=store_path, **kwargs
+            dataset_name=dataset_name, split="test" if dist_shift else "val", dataset_path=store_path, **kwargs
         ).to(device)
         return trainset, testset
 
@@ -131,13 +131,13 @@ def get_feature(
                             mean=torch.tensor([0.4850, 0.4560, 0.4060]),
                             std=torch.tensor([0.2290, 0.2240, 0.2250]),
                         ),
-#                        T.Normalize(
-#                            mean=torch.tensor([-0.0785, -0.0771, -0.0568, -0.0067, -0.0054, -0.0877, -0.0280, 0.1652]),
-#                            std=torch.tensor([0.9741, 0.9600, 0.9612, 0.9829, 0.9944, 0.9725, 0.9967, 1.1939]),
-#                        ),
+                        #                        T.Normalize(
+                        #                            mean=torch.tensor([-0.0785, -0.0771, -0.0568, -0.0067, -0.0054, -0.0877, -0.0280, 0.1652]),
+                        #                            std=torch.tensor([0.9741, 0.9600, 0.9612, 0.9829, 0.9944, 0.9725, 0.9967, 1.1939]),
+                        #                        ),
                     ]
                 )
-                #transforms = None
+                # transforms = None
 
         feature = TorchImageModel(
             store_path=store_path, dataset=dataset, transforms=transforms, **kwargs
