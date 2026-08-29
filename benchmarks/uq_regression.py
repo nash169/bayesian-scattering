@@ -35,7 +35,7 @@ from bayesian_scattering.utils.helpers import get_results
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # %%
-benchmark_id = "no_shift_cut_ens_skin_lesion"
+benchmark_id = "uq_poverty_dist_shift_1000"
 
 # %% [markdown]
 # ## Settings
@@ -45,8 +45,8 @@ with open(files("configs").joinpath("benchmarks.yaml")) as f:
     benchmarks_cfg = yaml.load(f, Loader=yaml.FullLoader)[benchmark_id]
 
 dataset = benchmarks_cfg["dataset"]
-features = benchmarks_cfg["features"]
 models = benchmarks_cfg["models"]
+features = benchmarks_cfg.get("features", models)
 
 dist_shift = benchmarks_cfg["dist_shift"]
 print("Out-of-distribution Benchmark:",dist_shift)

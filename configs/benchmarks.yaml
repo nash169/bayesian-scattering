@@ -1,78 +1,455 @@
-dist_shift_cut_poverty:
-  seeds: [12, 7589, 5437, 321, 665]
-  max_train: 1000
-  max_test: 250
-  dataset: "poverty"
-  features: ["scattering_cov_J5_L8", "scattering_cov_J6_L8", "scattering_cov_J7_L8", "scattering_inv_J5_L8", "scattering_inv_J6_L8", "scattering_inv_J7_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
-  models: ["base_reg", "gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear"]
-
-dist_shift_full_poverty:
-  seeds: [12, 7589, 5437, 321, 665]
-  max_train: null
-  max_test: 250
-  dataset: "poverty"
-  features: ["scattering_cov_J6_L8", "scattering_cov_J7_L8", "scattering_inv_J6_L8", "scattering_inv_J7_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
-  models: ["base_reg", "svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear"]
-
-dist_shift_cut_ens_poverty:
-  seeds: [12, 7589, 5437, 321, 665]
-  max_train: 1000
-  max_test: 250
-  dataset: "poverty"
-  features: ["identity"]
-  models: ["fullens_reg_convnext_atto"]
-
-dist_shift_full_ens_poverty:
-  seeds: [12, 7589, 5437, 321, 665]
-  max_train: null
-  max_test: 250
-  dataset: "poverty"
-  features: ["identity"]
-  models: ["fullens_reg_convnext_atto"]
-
 # -----------------------------------------------------
-
-dist_shift_cut_skin_lesion:
+# UNCERTAINTY QUANTIFICATION REGRESSION
+# -----------------------------------------------------
+uq_poverty_dist_shift_1000:
   seeds: [12, 7589, 5437, 321, 665]
-  max_train: 1000
-  max_test: 250
-  dataset: "skin_lesion"
-  features: ["scattering_cov_J3_L8", "scattering_cov_J4_L8", "scattering_cov_J5_L8", "scattering_inv_J3_L8", "scattering_inv_J4_L8", "scattering_inv_J5_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
-  models: ["base_reg", "gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear"]
-
-dist_shift_full_skin_lesion:
-  seeds: [12, 7589, 5437, 321, 665]
-  max_train: null
-  max_test: 250
-  dataset: "skin_lesion"
-  features: ["scattering_cov_J3_L8", "scattering_cov_J4_L8", "scattering_cov_J5_L8", "scattering_inv_J3_L8", "scattering_inv_J4_L8", "scattering_inv_J5_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
-  models: ["base_reg", "svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear"]
-
-dist_shift_cut_ens_skin_lesion:
-  seeds: [12, 7589, 5437, 321, 665]
+  dataset: "poverty"
   dist_shift: true
   max_train: 1000
   max_test: 250
-  dataset: "skin_lesion"
-  features: ["identity"]
-  models: ["fullens_reg_convnext_atto"]
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J6_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J7_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J6_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J7_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J6_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J7_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J6_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J7_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J6_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J7_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
 
-no_shift_cut_ens_skin_lesion:
+uq_poverty_dist_shift_full:
   seeds: [12, 7589, 5437, 321, 665]
+  dataset: "poverty"
+  dist_shift: true
+  max_train: null
+  max_test: 250
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J6_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J7_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J6_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J7_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J6_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J7_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J6_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J7_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J6_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J7_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+
+uq_poverty_no_shift_1000:
+  seeds: [12, 7589, 5437, 321, 665]
+  dataset: "poverty"
   dist_shift: false
   max_train: 1000
   max_test: 250
-  dataset: "skin_lesion"
-  features: ["identity"]
-  models: ["fullens_reg_convnext_atto"]
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J6_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J7_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J6_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J7_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J6_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J7_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J6_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J7_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J6_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J7_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
 
-dist_shift_full_ens_skin_lesion:
+uq_poverty_no_shift_full:
   seeds: [12, 7589, 5437, 321, 665]
+  dataset: "poverty"
+  dist_shift: false
   max_train: null
   max_test: 250
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J6_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J7_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J6_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J7_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J6_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J7_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J6_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J7_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J6_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J7_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+
+# -----------------------------------------------------
+
+uq_skin_lesion_dist_shift_1000:
+  seeds: [12, 7589, 5437, 321, 665]
   dataset: "skin_lesion"
-  features: ["identity"]
-  models: ["fullens_reg_convnext_atto"]
+  dist_shift: true
+  max_train: 1000
+  max_test: 250
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+
+uq_skin_lesion_dist_shift_full:
+  seeds: [12, 7589, 5437, 321, 665]
+  dataset: "skin_lesion"
+  dist_shift: true
+  max_train: null
+  max_test: 250
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+
+uq_skin_lesion_no_shift_1000:
+  seeds: [12, 7589, 5437, 321, 665]
+  dataset: "skin_lesion"
+  dist_shift: false
+  max_train: 1000
+  max_test: 250
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+
+uq_skin_lesion_no_shift_full:
+  seeds: [12, 7589, 5437, 321, 665]
+  dataset: "skin_lesion"
+  dist_shift: false
+  max_train: null
+  max_test: 250
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
 
 dist_shift_cut_skin_lesion_new:
   seeds: [12, 7589, 5437, 321, 665]
@@ -87,44 +464,232 @@ dist_shift_cut_skin_lesion_new:
 
 # -----------------------------------------------------
 
-dist_shift_cut_histology_nuclei:
+uq_histology_nuclei_dist_shift_1000:
   seeds: [12, 7589, 5437, 321, 665]
+  dataset: "histology_nuclei"
+  dist_shift: true
   max_train: 1000
   max_test: 250
-  dataset: "histology_nuclei"
-  features: ["scattering_cov_J3_L8", "scattering_cov_J4_L8", "scattering_cov_J5_L8", "scattering_inv_J3_L8", "scattering_inv_J4_L8", "scattering_inv_J5_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
-  models: ["base_reg", "gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear"]
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
 
-dist_shift_full_histology_nuclei:
+uq_histology_nuclei_dist_shift_full:
   seeds: [12, 7589, 5437, 321, 665]
+  dataset: "histology_nuclei"
+  dist_shift: true
   max_train: null
   max_test: 250
-  dataset: "histology_nuclei"
-  features: ["scattering_cov_J3_L8", "scattering_cov_J4_L8", "scattering_cov_J5_L8", "scattering_inv_J3_L8", "scattering_inv_J4_L8", "scattering_inv_J5_L8", "timm_convnext_atto", "timm_convnext_base", "timm_dinov2_small", "timm_dinov2_base"]
-  models: ["base_reg", "svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear"]
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
 
-dist_shift_cut_ens_histology_nuclei:
+uq_histology_nuclei_no_shift_1000:
   seeds: [12, 7589, 5437, 321, 665]
+  dataset: "histology_nuclei"
+  dist_shift: false
   max_train: 1000
   max_test: 250
-  dataset: "histology_nuclei"
-  features: ["identity"]
-  models: ["fullens_reg_convnext_atto"]
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["gp_reg_rbf", "gp_reg_rbf_ard", "gp_reg_matern52", "gp_reg_matern52_ard",  "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
 
-dist_shift_full_ens_histology_nuclei:
+uq_histology_nuclei_no_shift_full:
   seeds: [12, 7589, 5437, 321, 665]
+  dataset: "histology_nuclei"
+  dist_shift: false
   max_train: null
   max_test: 250
-  dataset: "histology_nuclei"
-  features: ["identity"]
-  models: ["fullens_reg_convnext_atto"]
+  models:
+    identity:
+      ["base_reg", "fullens_reg_convnext_atto"]
+    identity_flat:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_64:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_128:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    pca_256:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    randconv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8_o1:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_cov_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J3_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J4_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    scattering_inv_J5_L8:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_atto:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_convnext_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_small:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
+    timm_dinov2_base:
+      ["svgp_reg_rbf", "svgp_reg_rbf_ard", "svgp_reg_matern52", "svgp_reg_matern52_ard", "headens_reg_nonlinear", "cpmlp_reg_nonlinear", "cqr_reg_nonlinear"]
 
 # -----------------------------------------------------
-
-bayesian_opt:
-  initial_design_size: 50
-  n_iters: 50
-
+# UNCERTAINTY QUANTIFICATION CLASSIFICATION
 # -----------------------------------------------------
 
 dist_shift_cut_iwildcam:
@@ -160,3 +725,9 @@ dist_shift_full_ens_iwildcam:
   models: ["fullens_class_convnext_atto"]
 
 # -----------------------------------------------------
+# BAYESIAN OPTIMIZATION
+# -----------------------------------------------------
+
+bayesian_opt:
+  initial_design_size: 50
+  n_iters: 50

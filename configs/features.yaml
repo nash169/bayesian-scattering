@@ -14,6 +14,11 @@ scattering_cov_J3_L8:
   L: 8
   max_order: 2
   rot_invariant: false
+scattering_cov_J3_L8_o1:
+  J: 3
+  L: 8
+  max_order: 1
+  rot_invariant: false
 
 # skin_lesion - histology_nuclei J-2
 scattering_inv_J4_L8:
@@ -21,10 +26,20 @@ scattering_inv_J4_L8:
   L: 8
   max_order: 2
   rot_invariant: true
+scattering_inv_J4_L8_o1:
+  J: 4
+  L: 8
+  max_order: 1
+  rot_invariant: true
 scattering_cov_J4_L8:
   J: 4
   L: 8
   max_order: 2
+  rot_invariant: false
+scattering_cov_J4_L8_o1:
+  J: 4
+  L: 8
+  max_order: 1
   rot_invariant: false
 
 # skin_lesion - histology_nuclei J-1, poverty J-3
@@ -43,6 +58,11 @@ scattering_cov_J5_L8:
   L: 8
   max_order: 2
   rot_invariant: false
+scattering_cov_J5_L8_o1:
+  J: 5
+  L: 8
+  max_order: 1
+  rot_invariant: false
 
 # poverty J-2, qm2d J-3, iwildcam J-3
 scattering_inv_J6_L8:
@@ -50,10 +70,20 @@ scattering_inv_J6_L8:
   L: 8
   max_order: 2
   rot_invariant: true
+scattering_inv_J6_L8_o1:
+  J: 6
+  L: 8
+  max_order: 1
+  rot_invariant: true
 scattering_cov_J6_L8:
   J: 6
   L: 8
   max_order: 2
+  rot_invariant: false
+scattering_cov_J6_L8_o1:
+  J: 6
+  L: 8
+  max_order: 1
   rot_invariant: false
 
 # poverty J-1, qm2d J-2, iwildcam J-2
@@ -62,10 +92,20 @@ scattering_inv_J7_L8:
   L: 8
   max_order: 2
   rot_invariant: true
+scattering_inv_J7_L8_o1:
+  J: 7
+  L: 8
+  max_order: 1
+  rot_invariant: true
 scattering_cov_J7_L8:
   J: 7
   L: 8
   max_order: 2
+  rot_invariant: false
+scattering_cov_J7_L8_o1:
+  J: 7
+  L: 8
+  max_order: 1
   rot_invariant: false
 
 # qm2d J-1, iwildcam J-1
@@ -126,6 +166,10 @@ identity:
 identity_flat:
   flatten: true
 
+pca_64:
+  n_components: 64
+pca_128:
+  n_components: 128
 pca_256:
   n_components: 256
 
@@ -133,7 +177,19 @@ randconv_J3_L8:
   J: 3
   L: 8
   max_order: 2
+randconv_J4_L8:
+  J: 4
+  L: 8
+  max_order: 2
 randconv_J5_L8:
   J: 5
+  L: 8
+  max_order: 2
+randconv_J6_L8:
+  J: 6
+  L: 8
+  max_order: 2
+randconv_J7_L8:
+  J: 7
   L: 8
   max_order: 2
