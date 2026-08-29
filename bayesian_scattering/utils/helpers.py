@@ -667,7 +667,7 @@ def get_results(
 
     # Add timestamp to filename
     if store_path is not None:
-        timestamp = datetime.now().strftime("%y_%m_%d_%H_%M")
+        timestamp = datetime.now().strftime("%y_%m_%d_%H_%M_%S_%f")
 
         filename = str(store_path) + f"_{timestamp}.csv"
         df.to_csv(filename)

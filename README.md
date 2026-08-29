@@ -70,13 +70,14 @@ Optionally, you can pair and sync the `.ipynb` and `.py` files to keep both upda
 ```sh
 jupytext --set-formats ipynb,py:percent <script>.ipynb
 ```
-To run either the examples or the benchmarks, you need to specify three paths in env variables:
+To run either the examples or the benchmarks, you need to specify four paths in env variables:
 ```sh
 export DATASETS_PATH=<path/to/datasets>
 export FEATURES_PATH=<path/to/features>
+export MODELS_PATH=<path/to/models>
 export RESULTS_PATH=<path/to/results>
 ```
-The first defines where the datasets are stored. The second defines where the generated features are stored, which avoids recomputing them every time you run a script. The third defines where the results are saved.
+The first defines where the datasets are stored. The second defines where the generated features are stored, which avoids recomputing them every time you run a script. The third stores trained models so they can be reused, and the fourth defines where the results are saved.
 
 Expected layout under `DATASETS_PATH` for the pre-existing datasets:
 ```text

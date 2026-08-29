@@ -5,6 +5,7 @@ import torch
 import random
 import yaml
 
+from filelock import FileLock
 from pathlib import Path
 from torch.utils.data import DataLoader, TensorDataset
 from botorch.acquisition import LogExpectedImprovement
@@ -46,6 +47,9 @@ def benchmark_regression(dataset_id, dist_shift, models, features, cfg, device):
     features_path_train.mkdir(parents=True, exist_ok=True)
     features_path_test.mkdir(parents=True, exist_ok=True)
     features_path_val.mkdir(parents=True, exist_ok=True)
+
+    models_path = Path(os.environ["MODELS_PATH"])
+    models_path.mkdir(parents=True, exist_ok=True)
 
     # dataset
     trainset, testset = get_dataset(
@@ -110,7 +114,8 @@ def benchmark_regression(dataset_id, dist_shift, models, features, cfg, device):
                 **train_opts["dataloader"]
             )
 
-            for model_id in models:
+            model_ids = models[feature_id] if isinstance(models, dict) else models
+            for model_id in model_ids:
                 print(f"R: {rep + 1}/{len(seeds)}, D: {dataset_id}, F: {feature_id}, M: {model_id}, N_TRAIN: {len(f_train)}, N_TEST: {len(f_test)}")
                 curr_key = f"F_{feature_id}_M_{model_id}"
                 if curr_key not in benchmark_log:
@@ -123,15 +128,40 @@ def benchmark_regression(dataset_id, dist_shift, models, features, cfg, device):
                     **models_opts[model_id],
                 )
 
-                if "base" not in model_id:
-                    loss = train_model(
-                        model=model,
-                        data=f_train,
-                        cfg=train_opts,
-                        device=device
-                    )
-                else:
-                    loss = 0.0
+                model_path = models_path.joinpath(
+                    f"dataset_{dataset_id}__feature_{feature_id}__model_{model_id}"
+                    f"__n_train_{len(f_train)}__seed_{seed}.pt"
+                )
+                with FileLock(f"{model_path}.lock"):
+                    if model_path.exists():
+                        checkpoint = torch.load(
+                            model_path, map_location="cpu", weights_only=True
+                        )
+                        model.load_state_dict(checkpoint["model_state_dict"])
+                        loss = checkpoint["loss"]
+                        print(f"Loaded model: {model_path}")
+                    else:
+                        if "base" not in model_id:
+                            loss = train_model(
+                                model=model,
+                                data=f_train,
+                                cfg=train_opts,
+                                device=device
+                            )
+                        else:
+                            loss = 0.0
+
+                        model.cpu()
+                        tmp_model_path = model_path.with_suffix(".tmp")
+                        torch.save(
+                            {
+                                "model_state_dict": model.state_dict(),
+                                "loss": loss,
+                            },
+                            tmp_model_path,
+                        )
+                        tmp_model_path.replace(model_path)
+                        print(f"Saved model: {model_path}")
 
                 model.to(device)
                 results_dict = test_regression(
